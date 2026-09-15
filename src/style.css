@@ -1,0 +1,261 @@
+:root {
+  color-scheme: dark;
+  --bg: #04060e;
+  --bg-soft: #0a0f1f;
+  --panel: rgba(18, 26, 48, 0.72);
+  --line: rgba(126, 224, 255, 0.14);
+  --line-strong: rgba(126, 224, 255, 0.34);
+  --ink: #e6efff;
+  --muted: #8ba0c8;
+  --accent: #7ee0ff;
+  --accent-2: #a98cff;
+  --warn: #ffb648;
+  --bad: #ff6b7d;
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 700px at 12% -10%, rgba(56, 110, 255, 0.16), transparent 60%),
+    radial-gradient(900px 600px at 95% 110%, rgba(168, 74, 220, 0.14), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font:
+    14px/1.55 "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Верхня панель ---------- */
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(10, 15, 31, 0.92), rgba(10, 15, 31, 0.55));
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.brand strong {
+  background: linear-gradient(92deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand .tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+}
+
+.controls label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+select,
+input,
+button {
+  background: rgba(10, 17, 35, 0.9);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 7px 11px;
+  font:
+    13px/1.2 "Inter", ui-sans-serif, system-ui, sans-serif;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
+}
+
+select:focus-visible,
+input:focus-visible,
+button:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(126, 224, 255, 0.16);
+}
+
+input {
+  width: 78px;
+}
+
+input:disabled {
+  opacity: 0.4;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  border-color: var(--line-strong);
+  color: var(--accent);
+}
+
+/* ---------- Основна область ---------- */
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 24px 28px;
+  max-width: 1360px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.stage {
+  position: relative;
+  border-radius: var(--radius);
+  padding: 1px;
+  background: linear-gradient(140deg, rgba(126, 224, 255, 0.35), rgba(169, 140, 255, 0.18), transparent 70%);
+  box-shadow:
+    0 24px 60px -30px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+#arena {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 66vh;
+  display: block;
+  border-radius: calc(var(--radius) - 1px);
+  background: #04060e;
+}
+
+/* ---------- HUD ---------- */
+
+.hud {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 10px;
+}
+
+.hud__cell {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 9px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hud__cell::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+.hud__label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.hud__value {
+  font:
+    600 17px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud__value.is-bad {
+  color: var(--bad);
+}
+
+/* ---------- Текстові підписи ---------- */
+
+.note,
+.help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.note {
+  border-left: 2px solid var(--line-strong);
+  padding-left: 12px;
+  color: var(--ink);
+  opacity: 0.85;
+}
+
+kbd {
+  background: rgba(10, 17, 35, 0.9);
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 1px 6px;
+  margin: 0 1px;
+  color: var(--ink);
+  font:
+    12px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@media (max-width: 720px) {
+  .bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  main {
+    padding: 14px 14px 20px;
+  }
+
+  #arena {
+    max-height: none;
+  }
+}
