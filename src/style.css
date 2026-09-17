@@ -259,3 +259,54 @@ kbd {
     max-height: none;
   }
 }
+
+/* ---------- Лаба 2: стрічка подій і додаткові стани HUD ---------- */
+
+.controls__check {
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.controls__check input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--bad);
+}
+
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 22px;
+  font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--muted);
+}
+
+.log li {
+  padding-left: 14px;
+  position: relative;
+}
+
+.log li::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.log li:first-child {
+  color: var(--ink);
+}
+
+.log li.is-bad,
+.log li.is-bad:first-child {
+  color: var(--bad);
+}
+
+.hud__value.is-good {
+  color: #8affc1;
+}

@@ -6,44 +6,52 @@ import { createLoop } from "./loop.js";
 import { createIntervalLoop, createVariableLoop } from "./loop-variants.js";
 import { createRenderer } from "./render/draw.js";
 import { createHud } from "./render/hud.js";
-import { createShip, integrate, interpolate } from "./sim/ship.js";
+import { createGame } from "./sim/rules.js";
+import { demonstrateThisBug } from "./this-demo.js";
 
 const canvas = document.querySelector("#arena");
 const hudRoot = document.querySelector("#hud");
 const modeSelect = document.querySelector("#mode");
 const blockInput = document.querySelector("#block-ms");
 const noteEl = document.querySelector("#note");
+const logEl = document.querySelector("#log");
 
 const input = createInput();
 const renderer = createRenderer(canvas);
 const hud = createHud(hudRoot);
+const game = createGame({ onEvent: logEvent });
 
-// Два стани: попередній крок і поточний. Рендер малює щось між ними.
-let previousState = createShip();
-let currentState = previousState;
+/**
+ * Корабель не знає про клавіатуру — йому підсовують функцію-джерело вводу.
+ * Стрілка тут не випадкова: вона не має власного this, тому всередині
+ * залишається this із цього модуля, а не з об'єкта, який її викликав.
+ */
+game.ship.controller = () => input.snapshot();
+
 let loop = null;
 let mode = "none";
 
 function update(dt) {
   // Дія-подія: одне спрацювання на натискання, скільки б кроків клавішу
   // не тримали. Саме для цього в createInput є justPressed.
-  if (input.justPressed("debug")) renderer.toggleVelocity();
+  if (input.justPressed("debug")) {
+    const on = renderer.toggleVelocity();
+    logEvent("debug", { text: `вектор швидкості ${on ? "увімкнено" : "вимкнено"}` });
+  }
 
-  previousState = currentState;
-  currentState = integrate(currentState, input.snapshot(), dt);
+  game.step(dt);
 
   // «Свіжі» натискання живуть рівно один крок симуляції.
   input.endStep();
 }
 
 function render(alpha) {
-  // Експеримент 1: синхронна робота всередині кадру, один раз на кадр.
+  // Експеримент 1 з лаби 1: синхронна робота всередині кадру.
   if (mode === "block") {
     burnMilliseconds(Number(blockInput.value) || 0);
   }
-  const view = mode === "variable" ? currentState : interpolate(previousState, currentState, alpha);
-  renderer.render(view);
-  hud.update(loop.stats, currentState, EXPERIMENTS[mode].label, performance.now());
+  renderer.render(game.world, mode === "variable" ? 1 : alpha);
+  hud.update(loop.stats, game, EXPERIMENTS[mode].label, performance.now());
 }
 
 function buildLoop() {
@@ -56,7 +64,6 @@ function buildLoop() {
 function applyMode(next) {
   mode = next;
   loop?.stop();
-  previousState = currentState;
   loop = buildLoop();
   loop.start();
   noteEl.textContent = EXPERIMENTS[mode].description;
@@ -71,6 +78,44 @@ for (const [value, meta] of Object.entries(EXPERIMENTS)) {
 }
 modeSelect.value = "none";
 modeSelect.addEventListener("change", (event) => applyMode(event.target.value));
+
+/* ------------------------------------------------------------------ */
+/*  Баг із this: кнопка «Fire» у шапці                                  */
+/* ------------------------------------------------------------------ */
+
+const fireButton = document.querySelector("#fire");
+const brokenToggle = document.querySelector("#broken-this");
+
+/**
+ * НАВМИСНО зламаний варіант — рівно те, що хочеться написати першим:
+ *
+ *     fireButton.addEventListener("click", game.ship.fire);
+ *
+ * Метод відривається від об'єкта. При виклику слухача this буде кнопкою
+ * (для addEventListener — currentTarget), а в модулях діє strict mode,
+ * тож ніякої підміни на window не станеться. Звернення до приватного #hp
+ * або до this.pos кине TypeError.
+ */
+const brokenFire = game.ship.fire;
+
+/** Правильний варіант: стрілка бере this із замикання. */
+const workingFire = () => game.ship.fire(game.world);
+
+fireButton.addEventListener("click", (event) => {
+  if (!brokenToggle.checked) {
+    workingFire();
+    return;
+  }
+  try {
+    // Імітуємо саме той випадок: виклик без прив'язки до корабля.
+    brokenFire.call(event.currentTarget, game.world);
+    logEvent("this", { text: "несподівано спрацювало" });
+  } catch (error) {
+    logEvent("this-error", { text: `${error.constructor.name}: ${error.message}` });
+  }
+});
+
+/* ------------------------------------------------------------------ */
 
 const benchButton = document.querySelector("#bench");
 
@@ -103,14 +148,37 @@ if (new URLSearchParams(window.location.search).has("bench")) {
   });
 }
 
-document.querySelector("#reset").addEventListener("click", () => {
-  currentState = createShip();
-  previousState = currentState;
-});
+document.querySelector("#reset").addEventListener("click", () => game.reset());
+
+/** Стрічка подій під ареною: влучання, смерті, бонуси. */
+function logEvent(type, payload = {}) {
+  const text =
+    {
+      hit: () => `влучання, лишилось HP: ${payload.hp}`,
+      death: () => "корабель знищено, респаун через 2 с",
+      respawn: () => "респаун, 2 с невразливості",
+      score: () => `+${payload.amount} очок`,
+      pickup: () => `підібрано ${payload.label}`,
+      shot: () => null,
+      debug: () => payload.text,
+      this: () => `this: ${payload.text}`,
+      "this-error": () => `this зламався — ${payload.text}`,
+    }[type]?.() ?? null;
+
+  if (!text || !logEl) return;
+  const line = document.createElement("li");
+  line.textContent = text;
+  if (type === "this-error") line.className = "is-bad";
+  logEl.prepend(line);
+  while (logEl.children.length > 6) logEl.lastChild.remove();
+}
 
 applyMode("none");
 
-// Демонстрація порядку черг у консолі: див. розділ Reflection у README.
+// Експеримент із this і ланцюжком прототипів — друкується в консоль при старті.
+demonstrateThisBug(game.ship, game.world);
+
+// Демонстрація порядку черг із лаби 1.
 console.log("1 sync");
 setTimeout(() => console.log("4 macrotask (setTimeout)"), 0);
 queueMicrotask(() => console.log("3 microtask (queueMicrotask)"));
@@ -118,14 +186,18 @@ requestAnimationFrame(() => console.log("5 rAF (before paint)"));
 Promise.resolve().then(() => console.log("3.1 microtask (Promise)"));
 console.log("2 sync");
 
-// Дебаг-хук: дозволяє знімати цифри для README прямо з консолі.
+// Дебаг-хук: дозволяє знімати цифри й колупати світ прямо з консолі.
 window.starfall = {
   get stats() {
     return loop.stats;
   },
   get ship() {
-    return currentState;
+    return game.ship;
   },
+  get world() {
+    return game.world;
+  },
+  game,
   setMode(next) {
     modeSelect.value = next;
     applyMode(next);

@@ -3,14 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Starfall — Lab 01: Event Loop &amp; Game Loop</title>
+    <title>Starfall — Lab 02: Objects, Prototypes &amp; this</title>
   </head>
   <body>
     <header class="bar">
-      <h1 class="brand"><strong>Starfall</strong> <span class="tag">lab-01</span></h1>
+      <h1 class="brand"><strong>Starfall</strong> <span class="tag">lab-02</span></h1>
       <div class="controls">
         <label>Режим <select id="mode"></select></label>
         <label>Блокування, мс <input id="block-ms" type="number" value="20" min="0" max="500" step="5" /></label>
+        <button id="fire" type="button">Fire</button>
+        <label class="controls__check"><input id="broken-this" type="checkbox" /> зламаний this</label>
         <button id="bench" type="button">Run benchmark</button>
         <button id="reset" type="button">Reset ship</button>
       </div>
@@ -20,7 +22,8 @@
       <div class="stage"><canvas id="arena"></canvas></div>
       <div id="hud" class="hud"></div>
       <p id="note" class="note"></p>
-      <p class="help">Керування: <kbd>W</kbd>/<kbd>↑</kbd> тяга · <kbd>A</kbd><kbd>D</kbd>/<kbd>←</kbd><kbd>→</kbd> поворот · <kbd>S</kbd>/<kbd>↓</kbd> гальмо · <kbd>V</kbd> вектор швидкості. Краї арени загортаються.</p>
+      <ul id="log" class="log"></ul>
+      <p class="help">Керування: <kbd>W</kbd>/<kbd>↑</kbd> тяга · <kbd>A</kbd><kbd>D</kbd>/<kbd>←</kbd><kbd>→</kbd> поворот · <kbd>S</kbd>/<kbd>↓</kbd> гальмо · <kbd>Space</kbd> вогонь · <kbd>V</kbd> вектор швидкості. Краї арени загортаються.</p>
     </main>
 
     <script type="module" src="/src/main.js"></script>
