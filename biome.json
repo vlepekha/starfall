@@ -2,12 +2,12 @@
   "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "files": {
     "includes": [
-      "client/src/**/*.js",
+      "client/src/**/*.ts",
       "client/tools/**/*.{js,mjs}",
-      "client/*.js",
-      "server/src/**/*.js",
+      "client/*.{js,ts}",
+      "server/src/**/*.ts",
       "server/tools/**/*.mjs",
-      "shared/src/**/*.js",
+      "shared/src/**/*.ts",
       "*.js",
       "*.json",
       "client/*.json",

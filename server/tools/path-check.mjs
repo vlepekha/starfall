@@ -4,7 +4,7 @@
  *
  * Запуск: npm run check:paths -w @starfall/server
  */
-import { resolveSafe } from "../src/http-server.js";
+import { resolveSafe } from "../src/http-server.ts";
 
 const ROOT = "/srv/app/dist";
 

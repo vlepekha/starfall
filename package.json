@@ -19,9 +19,13 @@
     "bench:rss": "npm run bench:rss --workspace server",
     "bench:blocking": "npm run bench:blocking --workspace server",
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "typecheck": "tsc -p shared && tsc -p server && tsc -p client"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.13"
+    "@biomejs/biome": "^2.5.13",
+    "@types/node": "^26.6.5",
+    "@types/ws": "^8.18.2",
+    "typescript": "^7.0.2"
   }
 }

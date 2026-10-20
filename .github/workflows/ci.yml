@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["lab-*"]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # Типи стираються при збірці, тому перевірка типів — окремий крок,
+      # який нічого не збирає. Саме він ловить більшість помилок до запуску.
+      - name: Перевірка типів
+        run: npm run typecheck
+
+      - name: Лінтер і формат
+        run: npm run lint
+
+      - name: Збірка клієнта
+        run: npm run build
+
+      # Тест детермінізму: симуляція має давати ті самі числа, що й до
+      # переходу на TypeScript. Якщо щось поїхало — видно одразу.
+      - name: Детермінізм симуляції
+        run: npm run bench:physics
