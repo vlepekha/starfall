@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import { test } from "node:test";
+import { expect, test } from "vitest";
 
 /**
  * shared/ має імпортуватися в Node так само, як у браузері.
@@ -7,18 +6,18 @@ import { test } from "node:test";
  * глобала просто немає, і при цьому пакет завантажується й працює.
  */
 test("shared імпортується в Node без DOM", async () => {
-  assert.equal(typeof globalThis.document, "undefined", "у Node немає document");
-  assert.equal(typeof globalThis.window, "undefined", "у Node немає window");
+  expect(typeof globalThis.document).toBe("undefined", "у Node немає document");
+  expect(typeof globalThis.window).toBe("undefined", "у Node немає window");
 
   const shared = await import("../src/index.ts");
 
-  assert.equal(typeof shared.createGame, "function");
-  assert.equal(typeof shared.integrate, "function");
-  assert.equal(shared.TICK_HZ, 30);
+  expect(typeof shared.createGame).toBe("function");
+  expect(typeof shared.integrate).toBe("function");
+  expect(shared.TICK_HZ).toBe(30);
 
   const game = shared.createGame({ seed: 1 });
   game.step(shared.TICK_DT);
-  assert.ok(game.world.stats.steps > 0, "крок симуляції виконався");
+  expect(game.world.stats.steps > 0, "крок симуляції виконався").toBeTruthy();
 });
 
 test("у коді shared немає звернень до DOM", async () => {
@@ -43,6 +42,6 @@ test("у коді shared немає звернень до DOM", async () => {
       .split("\n")
       .filter((line) => !line.trim().startsWith("*") && !line.trim().startsWith("//"))
       .join("\n");
-    assert.ok(!forbidden.test(code), `${file} звертається до DOM`);
+    expect(!forbidden.test(code), `${file} звертається до DOM`).toBeTruthy();
   }
 });

@@ -7,6 +7,9 @@ on:
   pull_request:
 
 jobs:
+  # Порядок кроків — від найдешевшого до найдорожчого: типи падають за
+  # секунди, e2e піднімає два сервери й браузер. Немає сенсу ганяти
+  # браузер, якщо не збираються типи.
   check:
     runs-on: ubuntu-latest
     steps:
@@ -27,9 +30,10 @@ jobs:
       - name: Лінтер і формат
         run: npm run lint
 
-      # Детермінізм, кодек і перевірка, що shared вантажиться без DOM.
-      - name: Тести shared
-        run: npm test
+      # Детермінізм, кодек, пули, зіткнення й перевірка, що shared
+      # вантажиться без DOM.
+      - name: Тести
+        run: npm run test:coverage
 
       - name: Збірка клієнта
         run: npm run build
@@ -38,3 +42,24 @@ jobs:
       # переходу на TypeScript. Якщо щось поїхало — видно одразу.
       - name: Детермінізм симуляції
         run: npm run bench:physics
+
+      # Вартість кроку при 128 кораблях. Не падає за порогом — просто
+      # лишає число в логах, щоб регресію було видно в історії запусків.
+      - name: Вартість кроку при 128 кораблях
+        run: npm run bench:step -- 128
+
+      - name: Встановити браузер для e2e
+        run: npx playwright install --with-deps chromium
+
+      # Два справжні клієнти в одному матчі: перевіряє зв'язку
+      # клієнт-сервер цілком, чого не робить жоден юніт-тест.
+      - name: E2E (два гравці)
+        run: npm run e2e
+
+      - name: Звіт e2e при падінні
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

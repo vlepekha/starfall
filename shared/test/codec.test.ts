@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import { test } from "node:test";
+import { expect, test } from "vitest";
 import { binaryCodec, jsonCodec } from "../src/codec.ts";
 import { decodeInput, decodeSnapshot, encodeSnapshot, SIZES } from "../src/protocol.ts";
 import { Vector2 } from "../src/sim/vector.ts";
@@ -33,53 +32,53 @@ const payload = {
 
 test("input проходить кодування і розкодування без втрат", () => {
   const encoded = binaryCodec.encodeInput(frame);
-  assert.equal(encoded.byteLength, SIZES.INPUT_BYTES);
+  expect(encoded.byteLength).toBe(SIZES.INPUT_BYTES);
 
   const decoded = binaryCodec.decodeInput(encoded);
-  assert.ok(decoded);
-  assert.equal(decoded.seq, frame.seq);
-  assert.equal(decoded.clientTimeMs, frame.clientTimeMs);
-  assert.deepEqual(decoded.input, frame.input);
+  expect(decoded).toBeTruthy();
+  expect(decoded.seq).toBe(frame.seq);
+  expect(decoded.clientTimeMs).toBe(frame.clientTimeMs);
+  expect(decoded.input).toEqual(frame.input);
 });
 
 test("знімок повертається з тією точністю, яку обіцяє протокол", () => {
   const encoded = binaryCodec.encodeSnapshot(payload);
-  assert.equal(encoded.byteLength, SIZES.HEADER_BYTES + SIZES.ENTITY_BYTES);
+  expect(encoded.byteLength).toBe(SIZES.HEADER_BYTES + SIZES.ENTITY_BYTES);
 
   const decoded = binaryCodec.decodeSnapshot(encoded);
-  assert.ok(decoded);
-  assert.equal(decoded.tick, payload.tick);
-  assert.equal(decoded.ackSeq, payload.ackSeq);
-  assert.equal(decoded.rngState, payload.rngState);
+  expect(decoded).toBeTruthy();
+  expect(decoded.tick).toBe(payload.tick);
+  expect(decoded.ackSeq).toBe(payload.ackSeq);
+  expect(decoded.rngState).toBe(payload.rngState);
 
   const entity = decoded.entities[0];
-  assert.ok(entity);
+  expect(entity).toBeTruthy();
   // Позиція пакується з кроком 1/8 одиниці, кут — з кроком ~0.0001 рад.
-  assert.ok(Math.abs(entity.x - 800.5) <= 1 / 8);
-  assert.ok(Math.abs(entity.y - 450.25) <= 1 / 8);
-  assert.ok(Math.abs(entity.angle - Math.PI / 3) < 0.001);
-  assert.equal(entity.hp, 2);
-  assert.equal(entity.thrusting, true);
-  assert.equal(entity.you, true, "власний корабель має бути позначений");
+  expect(Math.abs(entity.x - 800.5) <= 1 / 8).toBeTruthy();
+  expect(Math.abs(entity.y - 450.25) <= 1 / 8).toBeTruthy();
+  expect(Math.abs(entity.angle - Math.PI / 3) < 0.001).toBeTruthy();
+  expect(entity.hp).toBe(2);
+  expect(entity.thrusting).toBe(true);
+  expect(entity.you).toBe(true, "власний корабель має бути позначений");
 });
 
 test("декодер відкидає кадр із чужим байтом версії", () => {
   const encoded = binaryCodec.encodeInput(frame);
   new DataView(encoded).setUint8(0, 99);
-  assert.equal(decodeInput(encoded), null);
+  expect(decodeInput(encoded)).toBe(null);
 });
 
 test("декодер відкидає обрізаний знімок", () => {
   const encoded = encodeSnapshot(payload);
   // Відрізаємо половину сутності: довжина більше не збігається з count.
   const truncated = encoded.slice(0, encoded.byteLength - 8);
-  assert.equal(decodeSnapshot(truncated), null);
+  expect(decodeSnapshot(truncated)).toBe(null);
 });
 
 test("декодер відкидає невідомі біти кнопок", () => {
   const encoded = binaryCodec.encodeInput(frame);
   new DataView(encoded).setUint8(6, 0b11111111);
-  assert.equal(decodeInput(encoded), null);
+  expect(decodeInput(encoded)).toBe(null);
 });
 
 test("JSON-кодек дає ті самі дані, але більший обсяг", () => {
@@ -87,7 +86,7 @@ test("JSON-кодек дає ті самі дані, але більший об�
   const json = jsonCodec.encodeSnapshot(payload);
 
   const fromJson = jsonCodec.decodeSnapshot(json);
-  assert.ok(fromJson);
-  assert.equal(fromJson.tick, payload.tick);
-  assert.ok(json.length > binary.byteLength * 3, "JSON має бути помітно більшим");
+  expect(fromJson).toBeTruthy();
+  expect(fromJson.tick).toBe(payload.tick);
+  expect(json.length > binary.byteLength * 3, "JSON має бути помітно більшим").toBeTruthy();
 });

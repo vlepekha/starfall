@@ -21,12 +21,24 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "typecheck": "tsc -p shared && tsc -p server && tsc -p client",
-    "test": "npm run test --workspace @starfall/shared"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "bench:step": "npm run bench:step --workspace server",
+    "bench:load": "npm run bench:load --workspace server",
+    "profile": "npm run profile --workspace server",
+    "chart:load": "node server/tools/load-chart.mjs > docs/load-chart.svg"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.13",
     "@types/node": "^26.6.5",
     "@types/ws": "^8.18.2",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.12",
+    "@vitest/coverage-v8": "^4.1.12",
+    "fast-check": "^4.3.0",
+    "@playwright/test": "^1.50.0"
   }
 }

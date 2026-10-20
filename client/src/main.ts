@@ -23,6 +23,7 @@ import { createIntervalLoop, createVariableLoop } from "./loop-variants.ts";
 import { createLink, type LinkSettings } from "./net/link.ts";
 import { createNetcode } from "./net/netcode.ts";
 import { GameSocket } from "./net/socket.ts";
+import { createPerfRecorder } from "./perf.ts";
 import { runPuzzles } from "./puzzles.ts";
 import { createRenderer } from "./render/draw.ts";
 import { createHud } from "./render/hud.ts";
@@ -66,6 +67,7 @@ const link = createLink({
 
 const netcode = createNetcode({ link, getInput: () => input.snapshot() });
 const netgraph = createNetgraph(netgraphRoot);
+const perf = createPerfRecorder();
 
 // Сирі кадри (бінарні знімки) не проходять через JSON-розбір у GameSocket —
 // вони одразу йдуть у канал із затримкою, а звідти в netcode.
@@ -256,6 +258,7 @@ async function startGame({ name, room }: { name: string; room: RoomInfo | null }
 
 function update(dt: number): void {
   if (!renderer) return;
+  perf.markUpdateStart();
   if (input.justPressed("debug")) {
     const on = renderer.toggleVelocity();
     logEvent("debug", { text: `вектор швидкості ${on ? "увімкнено" : "вимкнено"}` });
@@ -265,15 +268,18 @@ function update(dt: number): void {
   // і свої кулі — решта приходить знімками.
   netcode.update(dt);
   input.endStep();
+  perf.markUpdateEnd();
 }
 
 function render(alpha: number): void {
   if (!renderer || !hud || !loop || !game) return;
+  perf.markRenderStart();
   if (mode === "block") burnMilliseconds(Number(blockInput.value) || 0);
   const view = netcode.buildView();
   renderer.render(view, mode === "variable" ? 1 : alpha);
   hud.update(loop.stats, game, EXPERIMENTS[mode].label, performance.now());
   netgraph.update(netcode.stats, performance.now());
+  perf.markRenderEnd();
 }
 
 function buildLoop(): Loop {
@@ -479,7 +485,78 @@ function logEvent(type: string, payload: Record<string, unknown> = {}): void {
 
 const params = new URLSearchParams(window.location.search);
 
-if (params.has("puzzles")) {
+/**
+ * Режим заміру: ?perf=30 — автоматично зайти в кімнату, записати
+ * 30 секунд кадрів і покласти результат у буфер обміну.
+ * Потрібен для таблиць «до/після» в README.
+ */
+async function runPerfCapture(seconds: number): Promise<void> {
+  const ready = await loadAssets();
+  if (!ready) return;
+
+  await startGame({
+    name: "perf",
+    room: { id: "alpha", name: "alpha", arena: "classic", players: 0, capacity: 64 },
+  });
+
+  // Даємо грі влаштуватися: перші кадри завжди найдовші.
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  // Тримаємо газ і стріляємо — найважчий для рендера режим.
+  for (const code of ["KeyW", "KeyD", "Space"]) {
+    window.dispatchEvent(new KeyboardEvent("keydown", { code }));
+  }
+
+  perf.start();
+  await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+  const report = perf.stop();
+
+  for (const code of ["KeyW", "KeyD", "Space"]) {
+    window.dispatchEvent(new KeyboardEvent("keyup", { code }));
+  }
+
+  const payload = JSON.stringify({ ...report, entities: netcode.stats.entities }, null, 2);
+  console.log(payload);
+  document.title = `PERF DONE — p99 ${report.p99} мс`;
+  logEvent("net", { text: `замір: p99 ${report.p99} мс, довгих пауз ${report.longPauses}` });
+
+  /**
+   * Результат віддаємо приймачу, а не в буфер обміну: writeText
+   * працює лише у сфокусованому вікні, і під час заміру вікно
+   * зазвичай у фоні — перша версія цього коду саме так і мовчала.
+   */
+  const sink = params.get("sink");
+  if (sink) {
+    await fetch(sink, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: payload,
+    }).catch(() => {});
+  }
+}
+
+/** ?worker=64 — експеримент «воркер чи головний потік» для лаби 7. */
+async function runWorkerLab(entities: number): Promise<void> {
+  const { runWorkerExperiment } = await import("./worker-experiment.ts");
+  const result = await runWorkerExperiment(entities);
+  const payload = JSON.stringify(result, null, 2);
+  console.log(payload);
+  document.title = `WORKER DONE — ${result.verdict}`;
+  const sink = params.get("sink");
+  if (sink) {
+    await fetch(sink, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: payload,
+    }).catch(() => {});
+  }
+}
+
+if (params.has("worker")) {
+  void runWorkerLab(Number(params.get("worker")) || 64);
+} else if (params.has("perf")) {
+  void runPerfCapture(Number(params.get("perf")) || 30);
+} else if (params.has("puzzles")) {
   runPuzzles();
 } else {
   // Гра стартує ЛИШЕ після того, як усе завантажено.
@@ -519,6 +596,7 @@ window.starfall = {
   lobby,
   netcode,
   link,
+  perf,
   get game() {
     return game;
   },

@@ -1,3 +1,4 @@
+import { World } from "@starfall/shared";
 import { type Config, ConfigError, loadConfig } from "./config.ts";
 import { createHttpServer } from "./http-server.ts";
 import { createMatchLog } from "./match-log.ts";
@@ -14,6 +15,16 @@ try {
     process.exit(2); // падаємо одразу, а не через годину роботи
   }
   throw error;
+}
+
+/**
+ * Перемикач широкої фази — лише для замірів лаби 7. За замовчуванням
+ * працює сітка; brute дає повний перебір, щоб таблиця «до/після»
+ * порівнювала однакове залізо й однаковий код.
+ */
+if (process.env.STARFALL_BROADPHASE === "brute") {
+  World.useBruteForce();
+  console.log("широка фаза: повний перебір (режим заміру)");
 }
 
 const startedAt = Date.now();
@@ -55,7 +66,7 @@ const SEED_ROOMS: ReadonlyArray<readonly [string, string]> = [
 ];
 
 for (const [id, arena] of SEED_ROOMS) {
-  const room = rooms.ensure(id, { arena });
+  const room = rooms.ensure(id, { arena, capacity: config.roomCapacity });
   // Кімнати-«заготовки» не зникають, щойно з них вийде останній гравець.
   room.removeAllListeners("empty");
   room.on("empty", () => console.log(`[room ${id}] порожня, лишається як заготовка`));

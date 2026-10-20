@@ -1,7 +1,9 @@
 import { createRng, type Rng } from "../rng.ts";
 import type { EntityId, EntityKind } from "../types.ts";
-import { resolveCollisions } from "./collision.ts";
+import { Bullet } from "./bullet.ts";
+import { resolveCollisions, resolveCollisionsBruteForce } from "./collision.ts";
 import type { Entity, WorldLike } from "./entity.ts";
+import { Explosion } from "./explosion.ts";
 
 /** Шина подій, яку світ може повідомляти. Деталі — у клієнті/сервері. */
 export interface EventSink {
@@ -51,6 +53,19 @@ export class World implements WorldLike {
   constructor({ bus, seed = 1 }: { bus?: EventSink | null; seed?: number } = {}) {
     this.#bus = bus ?? null;
     this.rng = createRng(seed);
+  }
+
+  /**
+   * Який широкофазний алгоритм використовує світ.
+   *
+   * Перемикач існує лише для замірів: він дає змогу порівняти
+   * сітку з повним перебором на ОДНОМУ коді й одному залізі,
+   * а не з давнішим запуском. STARFALL_BROADPHASE=brute у сервері.
+   */
+  static broadphase: (world: WorldLike & Iterable<Entity>) => number = resolveCollisions;
+
+  static useBruteForce(): void {
+    World.broadphase = resolveCollisionsBruteForce;
   }
 
   spawn(entity: Entity): Entity {
@@ -125,7 +140,7 @@ export class World implements WorldLike {
       if (entity.alive) entity.update(dt, this);
     }
 
-    this.stats.collisions = resolveCollisions(this);
+    this.stats.collisions = World.broadphase(this);
 
     for (const entity of this.#spawnQueue) this.#entities.set(entity.id, entity);
     this.#spawnQueue.length = 0;
@@ -136,9 +151,16 @@ export class World implements WorldLike {
     this.stats.steps += 1;
   }
 
+  /**
+   * Прибирання мертвих. Тут же — повернення в пули: кулі й частинки
+   * вибуху складають назад, замість того щоб лишати їх збирачу сміття.
+   */
   #sweep(): void {
     for (const [id, entity] of this.#entities) {
-      if (!entity.alive) this.#entities.delete(id);
+      if (entity.alive) continue;
+      this.#entities.delete(id);
+      if (entity instanceof Bullet) Bullet.release(entity);
+      else if (entity instanceof Explosion) Explosion.release(entity);
     }
   }
 

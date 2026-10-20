@@ -29,10 +29,15 @@ const TICK_MS = 1000 / TICK_HZ;
 /** Скільки кадрів input сервер тримає про запас. Більше — зайва затримка. */
 const MAX_INPUT_BUFFER = 2;
 
+/** Пауза перед відродженням, секунди. Та сама, що й в одиночній грі. */
+const RESPAWN_DELAY = 2;
+
 export interface Player {
   readonly id: string;
   readonly name: string;
-  readonly ship: Ship;
+  ship: Ship;
+  /** Скільки лишилося до відродження. 0 — гравець живий. */
+  respawnIn: number;
   queue: InputFrame[];
   lastInput: InputState;
   ackSeq: Seq;
@@ -97,14 +102,17 @@ export class Match {
     return this.#players.size;
   }
 
-  addPlayer(id: string, name: string): Player {
+  /** Точка появи: по колу навколо центру, щоб не з'являтися один в одному. */
+  #spawnPoint(): Vector2 {
     const angle = this.game.world.rng.next() * Math.PI * 2;
-    const ship = new Ship({
-      pos: new Vector2(
-        WORLD.width / 2 + Math.cos(angle) * 220,
-        WORLD.height / 2 + Math.sin(angle) * 180,
-      ),
-    });
+    return new Vector2(
+      WORLD.width / 2 + Math.cos(angle) * 220,
+      WORLD.height / 2 + Math.sin(angle) * 180,
+    );
+  }
+
+  addPlayer(id: string, name: string): Player {
+    const ship = new Ship({ pos: this.#spawnPoint() });
     ship.playerName = name;
     this.game.world.add(ship);
 
@@ -117,6 +125,7 @@ export class Match {
       ackSeq: seq(0),
       clientTimeMs: millis(0),
       droppedInputs: 0,
+      respawnIn: 0,
     };
     // Корабель керується чергою input цього гравця — і більше нічим.
     ship.controller = () => player.lastInput;
@@ -189,8 +198,30 @@ export class Match {
       // не має перетворюватися на смикання корабля.
     }
 
+    /**
+     * Відродження гравців.
+     *
+     * Раніше відроджувався лише «нічий» корабель із createGame, а кораблі
+     * гравців після смерті зникали назавжди. У грі це означало, що після
+     * першої смерті людина лишалася глядачем; у навантажувальному тесті —
+     * що через півхвилини на сервері не лишалося нікого, і замір показував
+     * вартість кроку в порожньому світі.
+     */
+    for (const player of this.#players.values()) {
+      if (player.ship.alive) continue;
+      player.respawnIn -= TICK_DT;
+      if (player.respawnIn > 0) continue;
+
+      player.ship.reset(this.#spawnPoint());
+      this.game.world.add(player.ship);
+    }
+
     this.game.step(TICK_DT);
     this.tick = tick(this.tick + 1);
+
+    for (const player of this.#players.values()) {
+      if (!player.ship.alive && player.respawnIn <= 0) player.respawnIn = RESPAWN_DELAY;
+    }
 
     const entities: Packable[] = [];
     for (const entity of this.game.world) {

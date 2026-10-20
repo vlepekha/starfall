@@ -264,7 +264,7 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
       return;
     }
 
-    const room = rooms.ensure(roomId);
+    const room = rooms.ensure(roomId, { capacity: config.roomCapacity });
     if (!room.add({ id: state.id, name })) {
       socket.close(CLOSE.BAD_SHAPE, "room is full");
       return;

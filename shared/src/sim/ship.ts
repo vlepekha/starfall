@@ -180,7 +180,7 @@ export class Ship extends Entity {
 
     const useHoming = this.homingShots > 0;
     if (useHoming) this.homingShots -= 1;
-    const bullet = useHoming ? Bullet.homing(options) : new Bullet(options);
+    const bullet = useHoming ? Bullet.homing(options) : Bullet.take(options);
 
     world.spawn(bullet);
     world.emit("fired", { ship: this, bullet });

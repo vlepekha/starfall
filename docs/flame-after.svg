@@ -1,0 +1,1407 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1804" viewBox="0 0 1100 1804" font-family="ui-monospace, Menlo, monospace" font-size="10">
+<rect width="1100" height="1804" fill="#0a0f1f"/>
+<text x="8" y="16" fill="#e6efff" font-size="12">flame chart · CPU.20261020.220120.75070.0.001.cpuprofile · 1412 мс</text>
+<g><title>(root) — 1411.7 мс</title>
+<rect x="0.0" y="26" width="1099.0" height="16" fill="hsl(35, 78%, 47%)" stroke="#0a0f1f"/>
+<text x="3.0" y="37" fill="#1a1008">(root)</text>
+</g>
+<g><title>(idle) — 2.9 мс</title>
+<rect x="0.0" y="44" width="1.3" height="16" fill="hsl(17, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · run_main_module:1 — 36.2 мс</title>
+<rect x="2.3" y="44" width="27.2" height="16" fill="hsl(44, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>executeUserEntryPoint · run_main:140 — 36.2 мс</title>
+<rect x="2.3" y="62" width="27.2" height="16" fill="hsl(33, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>runEntryPointWithESMLoader · run_main:122 — 36.2 мс</title>
+<rect x="2.3" y="80" width="27.2" height="16" fill="hsl(22, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>asyncRunEntryPointWithESMLoader · run_main:89 — 36.2 мс</title>
+<rect x="2.3" y="98" width="27.2" height="16" fill="hsl(48, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>getOrInitializeCascadedLoader · loader:924 — 1.4 мс</title>
+<rect x="2.3" y="116" width="0.6" height="16" fill="hsl(37, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>createModuleLoader · loader:838 — 1.4 мс</title>
+<rect x="2.3" y="134" width="0.6" height="16" fill="hsl(16, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ModuleLoader · loader:212 — 1.4 мс</title>
+<rect x="2.3" y="152" width="0.6" height="16" fill="hsl(18, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ModuleLoader · loader:171 — 1.4 мс</title>
+<rect x="2.3" y="170" width="0.6" height="16" fill="hsl(42, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>newResolveCache · loader:88 — 1.4 мс</title>
+<rect x="2.3" y="188" width="0.6" height="16" fill="hsl(24, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="2.3" y="206" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="2.3" y="224" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · run_main:159 — 34.7 мс</title>
+<rect x="3.4" y="116" width="26.0" height="16" fill="hsl(39, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>import · loader:638 — 34.7 мс</title>
+<rect x="3.4" y="134" width="26.0" height="16" fill="hsl(12, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>tracePromise · node:diagnostics_channel:348 — 34.7 мс</title>
+<rect x="3.4" y="152" width="26.0" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>onImport.tracePromise.__proto__ · loader:639 — 34.7 мс</title>
+<rect x="3.4" y="170" width="26.0" height="16" fill="hsl(40, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>getOrCreateModuleJob · loader:607 — 34.7 мс</title>
+<rect x="3.4" y="188" width="26.0" height="16" fill="hsl(47, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterResolve · loader:617 — 34.7 мс</title>
+<rect x="3.4" y="206" width="26.0" height="16" fill="hsl(50, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#getOrCreateModuleJobAfterResolve · loader:543 — 34.7 мс</title>
+<rect x="3.4" y="224" width="26.0" height="16" fill="hsl(37, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ModuleJob · module_job:193 — 34.7 мс</title>
+<rect x="3.4" y="242" width="26.0" height="16" fill="hsl(31, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>link · module_job:224 — 34.7 мс</title>
+<rect x="3.4" y="260" width="26.0" height="16" fill="hsl(17, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>syncLink · module_job:129 — 34.7 мс</title>
+<rect x="3.4" y="278" width="26.0" height="16" fill="hsl(24, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>getOrCreateModuleJob · loader:607 — 34.7 мс</title>
+<rect x="3.4" y="296" width="26.0" height="16" fill="hsl(47, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#resolve · loader:686 — 1.4 мс</title>
+<rect x="3.4" y="314" width="0.6" height="16" fill="hsl(31, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>resolveSync · loader:742 — 1.4 мс</title>
+<rect x="3.4" y="332" width="0.6" height="16" fill="hsl(20, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#resolveAndMaybeBlockOnLoaderThread · loader:725 — 1.4 мс</title>
+<rect x="3.4" y="350" width="0.6" height="16" fill="hsl(25, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#cachedDefaultResolve · loader:704 — 1.4 мс</title>
+<rect x="3.4" y="368" width="0.6" height="16" fill="hsl(25, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>defaultResolve · resolve:945 — 1.4 мс</title>
+<rect x="3.4" y="386" width="0.6" height="16" fill="hsl(38, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>moduleResolve · resolve:831 — 1.4 мс</title>
+<rect x="3.4" y="404" width="0.6" height="16" fill="hsl(27, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterResolve · loader:617 — 33.3 мс</title>
+<rect x="4.5" y="314" width="24.9" height="16" fill="hsl(50, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#getOrCreateModuleJobAfterResolve · loader:543 — 33.3 мс</title>
+<rect x="4.5" y="332" width="24.9" height="16" fill="hsl(37, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>loadAndTranslate · loader:519 — 20.3 мс</title>
+<rect x="4.5" y="350" width="14.8" height="16" fill="hsl(34, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterLoad · loader:521 — 20.3 мс</title>
+<rect x="4.5" y="368" width="14.8" height="16" fill="hsl(16, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#translate · loader:458 — 20.3 мс</title>
+<rect x="4.5" y="386" width="14.8" height="16" fill="hsl(34, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · translators:659 — 20.3 мс</title>
+<rect x="4.5" y="404" width="14.8" height="16" fill="hsl(32, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>stripTypeScriptModuleTypes · typescript:180 — 20.3 мс</title>
+<rect x="4.5" y="422" width="14.8" height="16" fill="hsl(25, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>processTypeScriptCode · typescript:145 — 20.3 мс</title>
+<rect x="4.5" y="440" width="14.8" height="16" fill="hsl(23, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>parseTypeScript · typescript:57 — 20.3 мс</title>
+<rect x="4.5" y="458" width="14.8" height="16" fill="hsl(38, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · util:799 — 13.0 мс</title>
+<rect x="4.5" y="476" width="9.1" height="16" fill="hsl(40, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · typescript:45 — 13.0 мс</title>
+<rect x="4.5" y="494" width="9.1" height="16" fill="hsl(43, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 13.0 мс</title>
+<rect x="4.5" y="512" width="9.1" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 13.0 мс</title>
+<rect x="4.5" y="530" width="9.1" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · index:1 — 10.1 мс</title>
+<rect x="4.5" y="548" width="6.9" height="16" fill="hsl(16, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>__require · index:8 — 10.1 мс</title>
+<rect x="4.5" y="566" width="6.9" height="16" fill="hsl(48, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>lib/wasm.js · index:35 — 2.9 мс</title>
+<rect x="4.5" y="584" width="1.3" height="16" fill="hsl(14, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>from · node:buffer:306 — 1.4 мс</title>
+<rect x="4.5" y="602" width="0.6" height="16" fill="hsl(36, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>fromString · node:buffer:482 — 1.4 мс</title>
+<rect x="4.5" y="620" width="0.6" height="16" fill="hsl(30, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>fromStringFast · node:buffer:449 — 1.4 мс</title>
+<rect x="4.5" y="638" width="0.6" height="16" fill="hsl(15, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>createFromString · node:buffer:476 — 1.4 мс</title>
+<rect x="4.5" y="656" width="0.6" height="16" fill="hsl(43, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>write · node:buffer:686 — 1.4 мс</title>
+<rect x="4.5" y="674" width="0.6" height="16" fill="hsl(12, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>base64Write — 1.4 мс</title>
+<rect x="4.5" y="692" width="0.6" height="16" fill="hsl(44, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Module — 1.4 мс</title>
+<rect x="5.6" y="602" width="0.6" height="16" fill="hsl(24, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>transformSync · index:576 — 7.2 мс</title>
+<rect x="14.7" y="476" width="4.6" height="16" fill="hsl(26, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>module2.exports.transformSync · index:229 — 7.2 мс</title>
+<rect x="14.7" y="494" width="4.6" height="16" fill="hsl(12, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>js-to-wasm — 7.2 мс</title>
+<rect x="14.7" y="512" width="4.6" height="16" fill="hsl(50, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3235] · 009f7e1a:1 — 5.8 мс</title>
+<rect x="14.7" y="530" width="3.5" height="16" fill="hsl(51, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[86] · 009f7e1a:1 — 5.8 мс</title>
+<rect x="14.7" y="548" width="3.5" height="16" fill="hsl(26, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[63] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="14.7" y="566" width="2.4" height="16" fill="hsl(49, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5837] · 009f7e1a:1 — 2.9 мс</title>
+<rect x="14.7" y="584" width="1.3" height="16" fill="hsl(35, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[862] · 009f7e1a:1 — 2.9 мс</title>
+<rect x="14.7" y="602" width="1.3" height="16" fill="hsl(20, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[65] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="620" width="0.6" height="16" fill="hsl(51, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[347] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="638" width="0.6" height="16" fill="hsl(14, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[617] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="656" width="0.6" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="674" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="692" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="710" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="728" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="746" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="764" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="14.7" y="782" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[828] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="16.9" y="584" width="0.6" height="16" fill="hsl(50, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2407] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="16.9" y="602" width="0.6" height="16" fill="hsl(27, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6037] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="16.9" y="620" width="0.6" height="16" fill="hsl(34, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[321] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="16.9" y="638" width="0.6" height="16" fill="hsl(14, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4041] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="16.9" y="656" width="0.6" height="16" fill="hsl(19, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6037] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="16.9" y="674" width="0.6" height="16" fill="hsl(34, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[321] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="16.9" y="692" width="0.6" height="16" fill="hsl(14, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ModuleJob · module_job:193 — 13.0 мс</title>
+<rect x="20.3" y="350" width="9.1" height="16" fill="hsl(31, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>link · module_job:224 — 13.0 мс</title>
+<rect x="20.3" y="368" width="9.1" height="16" fill="hsl(17, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>syncLink · module_job:129 — 13.0 мс</title>
+<rect x="20.3" y="386" width="9.1" height="16" fill="hsl(24, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>getOrCreateModuleJob · loader:607 — 13.0 мс</title>
+<rect x="20.3" y="404" width="9.1" height="16" fill="hsl(47, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterResolve · loader:617 — 13.0 мс</title>
+<rect x="20.3" y="422" width="9.1" height="16" fill="hsl(50, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#getOrCreateModuleJobAfterResolve · loader:543 — 13.0 мс</title>
+<rect x="20.3" y="440" width="9.1" height="16" fill="hsl(37, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>loadAndTranslate · loader:519 — 7.2 мс</title>
+<rect x="20.3" y="458" width="4.6" height="16" fill="hsl(34, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterLoad · loader:521 — 7.2 мс</title>
+<rect x="20.3" y="476" width="4.6" height="16" fill="hsl(16, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#translate · loader:458 — 7.2 мс</title>
+<rect x="20.3" y="494" width="4.6" height="16" fill="hsl(34, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · translators:659 — 7.2 мс</title>
+<rect x="20.3" y="512" width="4.6" height="16" fill="hsl(32, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>stripTypeScriptModuleTypes · typescript:180 — 4.3 мс</title>
+<rect x="20.3" y="530" width="2.4" height="16" fill="hsl(25, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>processTypeScriptCode · typescript:145 — 4.3 мс</title>
+<rect x="20.3" y="548" width="2.4" height="16" fill="hsl(23, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>parseTypeScript · typescript:57 — 4.3 мс</title>
+<rect x="20.3" y="566" width="2.4" height="16" fill="hsl(38, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>transformSync · index:576 — 4.3 мс</title>
+<rect x="20.3" y="584" width="2.4" height="16" fill="hsl(26, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>module2.exports.transformSync · index:229 — 4.3 мс</title>
+<rect x="20.3" y="602" width="2.4" height="16" fill="hsl(12, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>js-to-wasm — 4.3 мс</title>
+<rect x="20.3" y="620" width="2.4" height="16" fill="hsl(50, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3235] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="20.3" y="638" width="2.4" height="16" fill="hsl(51, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[86] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="20.3" y="656" width="2.4" height="16" fill="hsl(26, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[63] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="20.3" y="674" width="2.4" height="16" fill="hsl(49, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5837] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="20.3" y="692" width="2.4" height="16" fill="hsl(35, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[862] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="20.3" y="710" width="2.4" height="16" fill="hsl(20, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[65] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="20.3" y="728" width="2.4" height="16" fill="hsl(51, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[541] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="20.3" y="746" width="0.6" height="16" fill="hsl(14, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[571] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="20.3" y="764" width="0.6" height="16" fill="hsl(25, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[130] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="20.3" y="782" width="0.6" height="16" fill="hsl(22, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4948] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="20.3" y="800" width="0.6" height="16" fill="hsl(43, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[347] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="746" width="0.6" height="16" fill="hsl(14, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[617] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="764" width="0.6" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="782" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="800" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="818" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="836" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="854" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="872" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="890" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4139] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="908" width="0.6" height="16" fill="hsl(41, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[147] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="926" width="0.6" height="16" fill="hsl(44, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2512] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="944" width="0.6" height="16" fill="hsl(24, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="962" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="980" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="998" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1016" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1034" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1052" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1070" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[122] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1088" width="0.6" height="16" fill="hsl(41, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1307] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1106" width="0.6" height="16" fill="hsl(51, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1898] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1124" width="0.6" height="16" fill="hsl(46, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1522] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1142" width="0.6" height="16" fill="hsl(40, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1349] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1160" width="0.6" height="16" fill="hsl(21, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1846] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1178" width="0.6" height="16" fill="hsl(19, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[991] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1196" width="0.6" height="16" fill="hsl(47, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1038] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1214" width="0.6" height="16" fill="hsl(48, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4540] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1232" width="0.6" height="16" fill="hsl(39, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[863] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1250" width="0.6" height="16" fill="hsl(29, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[673] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1268" width="0.6" height="16" fill="hsl(46, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1286" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1304" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1322" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[347] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1340" width="0.6" height="16" fill="hsl(14, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[617] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1358" width="0.6" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3226] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1376" width="0.6" height="16" fill="hsl(39, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2433] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1394" width="0.6" height="16" fill="hsl(22, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2375] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1412" width="0.6" height="16" fill="hsl(29, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2374] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1430" width="0.6" height="16" fill="hsl(38, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[584] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1448" width="0.6" height="16" fill="hsl(31, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[450] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1466" width="0.6" height="16" fill="hsl(23, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1334] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1484" width="0.6" height="16" fill="hsl(47, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[207] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1502" width="0.6" height="16" fill="hsl(15, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[80] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1520" width="0.6" height="16" fill="hsl(44, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1441] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1538" width="0.6" height="16" fill="hsl(36, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2959] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1556" width="0.6" height="16" fill="hsl(41, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[204] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1574" width="0.6" height="16" fill="hsl(26, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6128] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="21.4" y="1592" width="0.6" height="16" fill="hsl(21, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="746" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="764" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="782" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[347] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="800" width="0.6" height="16" fill="hsl(14, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[617] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="818" width="0.6" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="836" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="854" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="872" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="890" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="908" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="926" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="944" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[122] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="962" width="0.6" height="16" fill="hsl(41, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1307] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="980" width="0.6" height="16" fill="hsl(51, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1898] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="998" width="0.6" height="16" fill="hsl(46, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1522] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1016" width="0.6" height="16" fill="hsl(40, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1349] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1034" width="0.6" height="16" fill="hsl(21, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1846] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1052" width="0.6" height="16" fill="hsl(19, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[991] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1070" width="0.6" height="16" fill="hsl(47, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1038] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1088" width="0.6" height="16" fill="hsl(48, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4540] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1106" width="0.6" height="16" fill="hsl(39, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[863] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1124" width="0.6" height="16" fill="hsl(29, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[673] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1142" width="0.6" height="16" fill="hsl(46, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1160" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1178" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1196" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1279] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1214" width="0.6" height="16" fill="hsl(31, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1232" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1250" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1268" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1286" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1304" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1322" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1340" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3999] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1358" width="0.6" height="16" fill="hsl(46, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[615] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1376" width="0.6" height="16" fill="hsl(42, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1410] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1394" width="0.6" height="16" fill="hsl(38, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1412" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1430" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2489] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1448" width="0.6" height="16" fill="hsl(25, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1466" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1484" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1502" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1520" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1538" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[98] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="22.5" y="1556" width="0.6" height="16" fill="hsl(13, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>stringify · helpers:396 — 1.4 мс</title>
+<rect x="23.7" y="530" width="0.6" height="16" fill="hsl(33, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>decode · encoding:440 — 1.4 мс</title>
+<rect x="23.7" y="548" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ModuleJob · module_job:193 — 5.8 мс</title>
+<rect x="25.9" y="458" width="3.5" height="16" fill="hsl(31, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>link · module_job:224 — 5.8 мс</title>
+<rect x="25.9" y="476" width="3.5" height="16" fill="hsl(17, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>syncLink · module_job:129 — 5.8 мс</title>
+<rect x="25.9" y="494" width="3.5" height="16" fill="hsl(24, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>getOrCreateModuleJob · loader:607 — 5.8 мс</title>
+<rect x="25.9" y="512" width="3.5" height="16" fill="hsl(47, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterResolve · loader:617 — 5.8 мс</title>
+<rect x="25.9" y="530" width="3.5" height="16" fill="hsl(50, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#getOrCreateModuleJobAfterResolve · loader:543 — 5.8 мс</title>
+<rect x="25.9" y="548" width="3.5" height="16" fill="hsl(37, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>loadAndTranslate · loader:519 — 4.3 мс</title>
+<rect x="25.9" y="566" width="2.4" height="16" fill="hsl(34, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterLoad · loader:521 — 4.3 мс</title>
+<rect x="25.9" y="584" width="2.4" height="16" fill="hsl(16, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#translate · loader:458 — 4.3 мс</title>
+<rect x="25.9" y="602" width="2.4" height="16" fill="hsl(34, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · translators:659 — 4.3 мс</title>
+<rect x="25.9" y="620" width="2.4" height="16" fill="hsl(32, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>stripTypeScriptModuleTypes · typescript:180 — 4.3 мс</title>
+<rect x="25.9" y="638" width="2.4" height="16" fill="hsl(25, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>processTypeScriptCode · typescript:145 — 4.3 мс</title>
+<rect x="25.9" y="656" width="2.4" height="16" fill="hsl(23, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>parseTypeScript · typescript:57 — 4.3 мс</title>
+<rect x="25.9" y="674" width="2.4" height="16" fill="hsl(38, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>transformSync · index:576 — 4.3 мс</title>
+<rect x="25.9" y="692" width="2.4" height="16" fill="hsl(26, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>module2.exports.transformSync · index:229 — 4.3 мс</title>
+<rect x="25.9" y="710" width="2.4" height="16" fill="hsl(12, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>js-to-wasm — 4.3 мс</title>
+<rect x="25.9" y="728" width="2.4" height="16" fill="hsl(50, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3235] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="25.9" y="746" width="2.4" height="16" fill="hsl(51, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[86] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="25.9" y="764" width="2.4" height="16" fill="hsl(26, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[63] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="25.9" y="782" width="2.4" height="16" fill="hsl(49, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5837] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="25.9" y="800" width="2.4" height="16" fill="hsl(35, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[862] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="25.9" y="818" width="2.4" height="16" fill="hsl(20, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[65] · 009f7e1a:1 — 4.3 мс</title>
+<rect x="25.9" y="836" width="2.4" height="16" fill="hsl(51, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="854" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="872" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="890" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[347] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="908" width="0.6" height="16" fill="hsl(14, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[617] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="926" width="0.6" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="944" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="962" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="980" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="998" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1016" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1034" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1052" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[122] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1070" width="0.6" height="16" fill="hsl(41, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1307] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1088" width="0.6" height="16" fill="hsl(51, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1898] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1106" width="0.6" height="16" fill="hsl(46, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1522] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1124" width="0.6" height="16" fill="hsl(40, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1349] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1142" width="0.6" height="16" fill="hsl(21, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1846] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1160" width="0.6" height="16" fill="hsl(19, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[991] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1178" width="0.6" height="16" fill="hsl(47, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1038] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1196" width="0.6" height="16" fill="hsl(48, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4540] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1214" width="0.6" height="16" fill="hsl(39, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[863] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1232" width="0.6" height="16" fill="hsl(29, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[673] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1250" width="0.6" height="16" fill="hsl(46, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1268" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1286" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1304" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6069] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1322" width="0.6" height="16" fill="hsl(39, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4039] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1340" width="0.6" height="16" fill="hsl(22, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6032] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1358" width="0.6" height="16" fill="hsl(19, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1054] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1376" width="0.6" height="16" fill="hsl(18, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2435] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1394" width="0.6" height="16" fill="hsl(40, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5181] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1412" width="0.6" height="16" fill="hsl(17, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1430" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1279] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1448" width="0.6" height="16" fill="hsl(31, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1466" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1484" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[426] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1502" width="0.6" height="16" fill="hsl(24, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1520" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1538" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1556" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1574" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1592" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1610" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1628" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[98] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1646" width="0.6" height="16" fill="hsl(13, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1832] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1664" width="0.6" height="16" fill="hsl(18, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1884] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1682" width="0.6" height="16" fill="hsl(31, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4380] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1700" width="0.6" height="16" fill="hsl(45, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1441] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1718" width="0.6" height="16" fill="hsl(36, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2959] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1736" width="0.6" height="16" fill="hsl(41, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[204] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1754" width="0.6" height="16" fill="hsl(26, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5971] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="25.9" y="1772" width="0.6" height="16" fill="hsl(22, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5665] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="854" width="0.6" height="16" fill="hsl(44, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[794] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="872" width="0.6" height="16" fill="hsl(50, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[701] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="890" width="0.6" height="16" fill="hsl(16, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1360] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="908" width="0.6" height="16" fill="hsl(48, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1152] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="926" width="0.6" height="16" fill="hsl(47, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1961] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="944" width="0.6" height="16" fill="hsl(49, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2450] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="962" width="0.6" height="16" fill="hsl(47, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[375] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="980" width="0.6" height="16" fill="hsl(41, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1507] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="998" width="0.6" height="16" fill="hsl(47, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2514] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1016" width="0.6" height="16" fill="hsl(38, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2471] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1034" width="0.6" height="16" fill="hsl(32, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1897] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1052" width="0.6" height="16" fill="hsl(25, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3371] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1070" width="0.6" height="16" fill="hsl(38, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1037] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1088" width="0.6" height="16" fill="hsl(23, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6031] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1106" width="0.6" height="16" fill="hsl(12, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1038] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1124" width="0.6" height="16" fill="hsl(48, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4540] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1142" width="0.6" height="16" fill="hsl(39, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[863] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1160" width="0.6" height="16" fill="hsl(29, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[673] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1178" width="0.6" height="16" fill="hsl(46, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1196" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1214" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1232" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1279] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1250" width="0.6" height="16" fill="hsl(31, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1268" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1286" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1304" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1322" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1340" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6045] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1358" width="0.6" height="16" fill="hsl(15, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3999] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1376" width="0.6" height="16" fill="hsl(46, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[615] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1394" width="0.6" height="16" fill="hsl(42, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1410] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1412" width="0.6" height="16" fill="hsl(38, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1430" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1448" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1466" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1484" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1502" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1520" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="27.0" y="1538" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[524] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="854" width="0.6" height="16" fill="hsl(15, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5421] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="872" width="0.6" height="16" fill="hsl(46, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2137] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="890" width="0.6" height="16" fill="hsl(33, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[159] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="908" width="0.6" height="16" fill="hsl(21, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[942] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="926" width="0.6" height="16" fill="hsl(49, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[70] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="944" width="0.6" height="16" fill="hsl(21, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1813] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="962" width="0.6" height="16" fill="hsl(19, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3531] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="980" width="0.6" height="16" fill="hsl(44, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1152] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="998" width="0.6" height="16" fill="hsl(47, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1961] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1016" width="0.6" height="16" fill="hsl(49, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2450] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1034" width="0.6" height="16" fill="hsl(47, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[375] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1052" width="0.6" height="16" fill="hsl(41, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1507] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1070" width="0.6" height="16" fill="hsl(47, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2514] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1088" width="0.6" height="16" fill="hsl(38, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2471] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1106" width="0.6" height="16" fill="hsl(32, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1897] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1124" width="0.6" height="16" fill="hsl(25, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3371] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1142" width="0.6" height="16" fill="hsl(38, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1037] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1160" width="0.6" height="16" fill="hsl(23, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[6031] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1178" width="0.6" height="16" fill="hsl(12, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1038] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1196" width="0.6" height="16" fill="hsl(48, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[4540] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1214" width="0.6" height="16" fill="hsl(39, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[863] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1232" width="0.6" height="16" fill="hsl(29, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[673] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1250" width="0.6" height="16" fill="hsl(46, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1268" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1286" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1304" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[347] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1322" width="0.6" height="16" fill="hsl(14, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[617] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1340" width="0.6" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1358" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1376" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2489] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1394" width="0.6" height="16" fill="hsl(25, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1412" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[340] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1430" width="0.6" height="16" fill="hsl(41, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1201] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1448" width="0.6" height="16" fill="hsl(30, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[276] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1466" width="0.6" height="16" fill="hsl(33, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[281] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1484" width="0.6" height="16" fill="hsl(37, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2511] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1502" width="0.6" height="16" fill="hsl(49, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[95] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1520" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3999] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1538" width="0.6" height="16" fill="hsl(46, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[615] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1556" width="0.6" height="16" fill="hsl(42, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[1410] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1574" width="0.6" height="16" fill="hsl(38, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3138] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="28.2" y="1592" width="0.6" height="16" fill="hsl(17, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ModuleJob · module_job:193 — 1.4 мс</title>
+<rect x="29.3" y="566" width="0.6" height="16" fill="hsl(31, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>link · module_job:224 — 1.4 мс</title>
+<rect x="29.3" y="584" width="0.6" height="16" fill="hsl(17, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>syncLink · module_job:129 — 1.4 мс</title>
+<rect x="29.3" y="602" width="0.6" height="16" fill="hsl(24, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>getOrCreateModuleJob · loader:607 — 1.4 мс</title>
+<rect x="29.3" y="620" width="0.6" height="16" fill="hsl(47, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterResolve · loader:617 — 1.4 мс</title>
+<rect x="29.3" y="638" width="0.6" height="16" fill="hsl(50, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#getOrCreateModuleJobAfterResolve · loader:543 — 1.4 мс</title>
+<rect x="29.3" y="656" width="0.6" height="16" fill="hsl(37, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>loadAndTranslate · loader:519 — 1.4 мс</title>
+<rect x="29.3" y="674" width="0.6" height="16" fill="hsl(34, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>afterLoad · loader:521 — 1.4 мс</title>
+<rect x="29.3" y="692" width="0.6" height="16" fill="hsl(16, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#translate · loader:458 — 1.4 мс</title>
+<rect x="29.3" y="710" width="0.6" height="16" fill="hsl(34, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · translators:659 — 1.4 мс</title>
+<rect x="29.3" y="728" width="0.6" height="16" fill="hsl(32, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>stripTypeScriptModuleTypes · typescript:180 — 1.4 мс</title>
+<rect x="29.3" y="746" width="0.6" height="16" fill="hsl(25, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>processTypeScriptCode · typescript:145 — 1.4 мс</title>
+<rect x="29.3" y="764" width="0.6" height="16" fill="hsl(23, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>parseTypeScript · typescript:57 — 1.4 мс</title>
+<rect x="29.3" y="782" width="0.6" height="16" fill="hsl(38, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>transformSync · index:576 — 1.4 мс</title>
+<rect x="29.3" y="800" width="0.6" height="16" fill="hsl(26, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>module2.exports.transformSync · index:229 — 1.4 мс</title>
+<rect x="29.3" y="818" width="0.6" height="16" fill="hsl(12, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>js-to-wasm — 1.4 мс</title>
+<rect x="29.3" y="836" width="0.6" height="16" fill="hsl(50, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[3235] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="854" width="0.6" height="16" fill="hsl(51, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[86] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="872" width="0.6" height="16" fill="hsl(26, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[63] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="890" width="0.6" height="16" fill="hsl(49, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5837] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="908" width="0.6" height="16" fill="hsl(35, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[862] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="926" width="0.6" height="16" fill="hsl(20, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[65] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="944" width="0.6" height="16" fill="hsl(51, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[2434] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="962" width="0.6" height="16" fill="hsl(31, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5180] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="980" width="0.6" height="16" fill="hsl(16, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[72] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="998" width="0.6" height="16" fill="hsl(41, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wasm-function[5701] · 009f7e1a:1 — 1.4 мс</title>
+<rect x="29.3" y="1016" width="0.6" height="16" fill="hsl(17, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>run · module_job:402 — 1285.9 мс</title>
+<rect x="30.4" y="44" width="1000.9" height="16" fill="hsl(16, 78%, 58%)" stroke="#0a0f1f"/>
+<text x="33.4" y="55" fill="#1a1008">run · module_job:402</text>
+</g>
+<g><title>evaluate — 1285.9 мс</title>
+<rect x="30.4" y="62" width="1000.9" height="16" fill="hsl(45, 78%, 49%)" stroke="#0a0f1f"/>
+<text x="33.4" y="73" fill="#1a1008">evaluate</text>
+</g>
+<g><title>(анонімна) · bench-step.mjs:1 — 1284.4 мс</title>
+<rect x="30.4" y="80" width="999.8" height="16" fill="hsl(39, 78%, 47%)" stroke="#0a0f1f"/>
+<text x="33.4" y="91" fill="#1a1008">(анонімна) · bench-step.mjs:1</text>
+</g>
+<g><title>step · rules.ts:176 — 1280.1 мс</title>
+<rect x="30.4" y="98" width="996.4" height="16" fill="hsl(29, 78%, 45%)" stroke="#0a0f1f"/>
+<text x="33.4" y="109" fill="#1a1008">step · rules.ts:176</text>
+</g>
+<g><title>step · world.ts:121 — 1242.5 мс</title>
+<rect x="30.4" y="116" width="967.1" height="16" fill="hsl(46, 78%, 54%)" stroke="#0a0f1f"/>
+<text x="33.4" y="127" fill="#1a1008">step · world.ts:121</text>
+</g>
+<g><title>update · ship.ts:142 — 37.6 мс</title>
+<rect x="30.4" y="134" width="28.3" height="16" fill="hsl(50, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>fire · ship.ts:169 — 15.9 мс</title>
+<rect x="30.4" y="152" width="11.4" height="16" fill="hsl(20, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>emit · world.ts:116 — 1.4 мс</title>
+<rect x="30.4" y="170" width="0.6" height="16" fill="hsl(47, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Bullet · bullet.ts:17 — 10.1 мс</title>
+<rect x="31.6" y="170" width="6.9" height="16" fill="hsl(32, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ttl · behaviors.ts:15 — 2.9 мс</title>
+<rect x="31.6" y="188" width="1.3" height="16" fill="hsl(15, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Entity · entity.ts:55 — 2.9 мс</title>
+<rect x="33.8" y="188" width="1.3" height="16" fill="hsl(18, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Entity · entity.ts:42 — 1.4 мс</title>
+<rect x="33.8" y="206" width="0.6" height="16" fill="hsl(24, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>fromAngle · vector.ts:24 — 4.3 мс</title>
+<rect x="39.4" y="170" width="2.4" height="16" fill="hsl(50, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>integrate · ship.ts:37 — 15.9 мс</title>
+<rect x="42.8" y="152" width="11.4" height="16" fill="hsl(39, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wrap · arena.ts:26 — 1.4 мс</title>
+<rect x="42.8" y="170" width="0.6" height="16" fill="hsl(37, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Vector2 · vector.ts:14 — 2.9 мс</title>
+<rect x="55.2" y="152" width="1.3" height="16" fill="hsl(31, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>update · entity.ts:74 — 23.1 мс</title>
+<rect x="59.7" y="134" width="17.0" height="16" fill="hsl(31, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wrap · arena.ts:26 — 8.7 мс</title>
+<rect x="59.7" y="152" width="5.8" height="16" fill="hsl(37, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>update · behaviors.ts:22 — 2.9 мс</title>
+<rect x="66.5" y="152" width="1.3" height="16" fill="hsl(50, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>update · behaviors.ts:43 — 2.9 мс</title>
+<rect x="68.7" y="152" width="1.3" height="16" fill="hsl(33, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>nearestOfKind · world.ts:91 — 2.9 мс</title>
+<rect x="68.7" y="170" width="1.3" height="16" fill="hsl(45, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wrappedDistanceTo · vector.ts:74 — 2.9 мс</title>
+<rect x="68.7" y="188" width="1.3" height="16" fill="hsl(37, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>shortestDeltaTo · vector.ts:63 — 2.9 мс</title>
+<rect x="68.7" y="206" width="1.3" height="16" fill="hsl(23, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>resolveCollisions · collision.ts:64 — 959.0 мс</title>
+<rect x="77.8" y="134" width="746.2" height="16" fill="hsl(21, 78%, 56%)" stroke="#0a0f1f"/>
+<text x="80.8" y="145" fill="#1a1008">resolveCollisions · collision.ts:64</text>
+</g>
+<g><title>intersects · entity.ts:96 — 134.5 мс</title>
+<rect x="77.8" y="152" width="103.8" height="16" fill="hsl(30, 78%, 54%)" stroke="#0a0f1f"/>
+<text x="80.8" y="163" fill="#1a1008">intersects · enti</text>
+</g>
+<g><title>pairKey · collision.ts:25 — 2.9 мс</title>
+<rect x="182.6" y="152" width="1.3" height="16" fill="hsl(30, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · rules.ts:66 — 44.8 мс</title>
+<rect x="184.8" y="152" width="33.9" height="16" fill="hsl(45, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>explode · rules.ts:45 — 41.9 мс</title>
+<rect x="184.8" y="170" width="31.7" height="16" fill="hsl(41, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Explosion · explosion.ts:34 — 40.5 мс</title>
+<rect x="184.8" y="188" width="30.6" height="16" fill="hsl(13, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Entity · entity.ts:55 — 1.4 мс</title>
+<rect x="184.8" y="206" width="0.6" height="16" fill="hsl(18, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · explosion.ts:47 — 11.6 мс</title>
+<rect x="186.0" y="206" width="8.0" height="16" fill="hsl(28, 78%, 49%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Explosion.random · explosion.ts:46 — 2.9 мс</title>
+<rect x="186.0" y="224" width="1.3" height="16" fill="hsl(21, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>next · rng.ts:17 — 2.9 мс</title>
+<rect x="186.0" y="242" width="1.3" height="16" fill="hsl(36, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>damage · ship.ts:190 — 2.9 мс</title>
+<rect x="217.5" y="170" width="1.3" height="16" fill="hsl(33, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>kill · entity.ts:83 — 1.4 мс</title>
+<rect x="217.5" y="188" width="0.6" height="16" fill="hsl(18, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>emit · world.ts:116 — 1.4 мс</title>
+<rect x="218.6" y="188" width="0.6" height="16" fill="hsl(47, 78%, 50%)" stroke="#0a0f1f"/>
+</g>
+<g><title>cellIndex · collision.ts:57 — 15.9 мс</title>
+<rect x="219.8" y="152" width="11.4" height="16" fill="hsl(20, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>update · explosion.ts:61 — 43.4 мс</title>
+<rect x="825.0" y="134" width="32.8" height="16" fill="hsl(47, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>wrap · arena.ts:26 — 4.3 мс</title>
+<rect x="825.0" y="152" width="2.4" height="16" fill="hsl(37, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>#sweep · world.ts:139 — 11.6 мс</title>
+<rect x="858.8" y="134" width="8.0" height="16" fill="hsl(20, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>update · behaviors.ts:22 — 1.4 мс</title>
+<rect x="867.8" y="134" width="0.6" height="16" fill="hsl(50, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>update · explosion.ts:61 — 1.4 мс</title>
+<rect x="998.6" y="116" width="0.6" height="16" fill="hsl(47, 78%, 62%)" stroke="#0a0f1f"/>
+</g>
+<g><title>spawnPickup · rules.ts:150 — 1.4 мс</title>
+<rect x="999.7" y="116" width="0.6" height="16" fill="hsl(46, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>homingAmmo · pickup.ts:27 — 1.4 мс</title>
+<rect x="999.7" y="134" width="0.6" height="16" fill="hsl(23, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Pickup · pickup.ts:17 — 1.4 мс</title>
+<rect x="999.7" y="152" width="0.6" height="16" fill="hsl(32, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Entity · entity.ts:55 — 1.4 мс</title>
+<rect x="999.7" y="170" width="0.6" height="16" fill="hsl(18, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>countOf · rules.ts:158 — 14.5 мс</title>
+<rect x="1000.8" y="116" width="10.3" height="16" fill="hsl(39, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>ofKind · world.ts:85 — 13.0 мс</title>
+<rect x="1000.8" y="134" width="9.1" height="16" fill="hsl(30, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>consoleCall — 2.9 мс</title>
+<rect x="1027.9" y="98" width="1.3" height="16" fill="hsl(31, 78%, 45%)" stroke="#0a0f1f"/>
+</g>
+<g><title>log · constructor:412 — 2.9 мс</title>
+<rect x="1027.9" y="116" width="1.3" height="16" fill="hsl(20, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>value · constructor:285 — 2.9 мс</title>
+<rect x="1027.9" y="134" width="1.3" height="16" fill="hsl(27, 78%, 51%)" stroke="#0a0f1f"/>
+</g>
+<g><title>get · constructor:220 — 1.4 мс</title>
+<rect x="1027.9" y="152" width="0.6" height="16" fill="hsl(39, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>getStdout · is_main_thread:151 — 1.4 мс</title>
+<rect x="1027.9" y="170" width="0.6" height="16" fill="hsl(50, 78%, 61%)" stroke="#0a0f1f"/>
+</g>
+<g><title>createWritableStdioStream · is_main_thread:50 — 1.4 мс</title>
+<rect x="1027.9" y="188" width="0.6" height="16" fill="hsl(14, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="1027.9" y="206" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="1027.9" y="224" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · sync_write_stream:1 — 1.4 мс</title>
+<rect x="1027.9" y="242" width="0.6" height="16" fill="hsl(18, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="1027.9" y="260" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="1027.9" y="278" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · node:stream:1 — 1.4 мс</title>
+<rect x="1027.9" y="296" width="0.6" height="16" fill="hsl(34, 78%, 47%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="1027.9" y="314" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="1027.9" y="332" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · operators:1 — 1.4 мс</title>
+<rect x="1027.9" y="350" width="0.6" height="16" fill="hsl(13, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="1027.9" y="368" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="1027.9" y="386" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · compose:1 — 1.4 мс</title>
+<rect x="1027.9" y="404" width="0.6" height="16" fill="hsl(24, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="1027.9" y="422" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="1027.9" y="440" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · pipeline:1 — 1.4 мс</title>
+<rect x="1027.9" y="458" width="0.6" height="16" fill="hsl(46, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="1027.9" y="476" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="1027.9" y="494" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · duplex:1 — 1.4 мс</title>
+<rect x="1027.9" y="512" width="0.6" height="16" fill="hsl(16, 78%, 53%)" stroke="#0a0f1f"/>
+</g>
+<g><title>requireBuiltin · realm:420 — 1.4 мс</title>
+<rect x="1027.9" y="530" width="0.6" height="16" fill="hsl(48, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>compileForInternalLoader · realm:383 — 1.4 мс</title>
+<rect x="1027.9" y="548" width="0.6" height="16" fill="hsl(36, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · readable:1 — 1.4 мс</title>
+<rect x="1027.9" y="566" width="0.6" height="16" fill="hsl(40, 78%, 48%)" stroke="#0a0f1f"/>
+</g>
+<g><title>Writable.write · writable:502 — 1.4 мс</title>
+<rect x="1029.0" y="152" width="0.6" height="16" fill="hsl(33, 78%, 52%)" stroke="#0a0f1f"/>
+</g>
+<g><title>_write · writable:451 — 1.4 мс</title>
+<rect x="1029.0" y="170" width="0.6" height="16" fill="hsl(27, 78%, 54%)" stroke="#0a0f1f"/>
+</g>
+<g><title>from · node:buffer:306 — 1.4 мс</title>
+<rect x="1029.0" y="188" width="0.6" height="16" fill="hsl(36, 78%, 59%)" stroke="#0a0f1f"/>
+</g>
+<g><title>fromString · node:buffer:482 — 1.4 мс</title>
+<rect x="1029.0" y="206" width="0.6" height="16" fill="hsl(30, 78%, 60%)" stroke="#0a0f1f"/>
+</g>
+<g><title>fromStringFast · node:buffer:449 — 1.4 мс</title>
+<rect x="1029.0" y="224" width="0.6" height="16" fill="hsl(15, 78%, 55%)" stroke="#0a0f1f"/>
+</g>
+<g><title>createPool · node:buffer:154 — 1.4 мс</title>
+<rect x="1029.0" y="242" width="0.6" height="16" fill="hsl(39, 78%, 58%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(garbage collector) — 60.8 мс</title>
+<rect x="1032.4" y="44" width="46.3" height="16" fill="hsl(27, 78%, 56%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(program) — 24.6 мс</title>
+<rect x="1079.7" y="44" width="18.2" height="16" fill="hsl(31, 78%, 57%)" stroke="#0a0f1f"/>
+</g>
+<g><title>(анонімна) · rules.ts:66 — 1.4 мс</title>
+<rect x="1098.9" y="44" width="0.6" height="16" fill="hsl(45, 78%, 46%)" stroke="#0a0f1f"/>
+</g>
+</svg>

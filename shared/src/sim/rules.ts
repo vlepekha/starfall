@@ -47,7 +47,7 @@ function explode(
   pos: Vector2,
   options: { count?: number; color?: string; speed?: number } = {},
 ): void {
-  world.spawn(new Explosion({ pos, rng: world.rng, ...options }));
+  world.spawn(Explosion.take({ pos, rng: world.rng, ...options }));
   world.emit("exploded", { pos, big: (options.count ?? 14) >= 20 });
 }
 

@@ -34,12 +34,22 @@ export interface NetOptions {
 }
 
 /** Сутність у тому вигляді, в якому її чекає рендер. */
+export interface ReadPoint {
+  readonly x: number;
+  readonly y: number;
+}
+
 export interface ViewEntity {
   id: EntityId;
   kind: string;
-  pos: Vector2;
-  previousPos: Vector2;
-  vel: Vector2;
+  /**
+   * Не Vector2, а точка «тільки для читання»: кадровий шлях бере ці
+   * записи з пулу й перезаписує числа на місці. Vector2 тут не підходив
+   * саме тому, що він незмінний — кожен кадр давав би новий об'єкт.
+   */
+  pos: ReadPoint;
+  previousPos: ReadPoint;
+  vel: ReadPoint;
   angle: number;
   previousAngle: number;
   radius: number;
@@ -117,6 +127,46 @@ export function createNetcode({ link, getInput }: { link: Link; getInput: () => 
   // Поточне згладжування поправки: різниця між тим, що ми малювали,
   // і тим, де корабель опинився після звірки.
   let correction = new Vector2(0, 0);
+
+  /**
+   * Кадровий пул: 37 сутностей на екрані давали 37 записів і 111 векторів
+   * за кадр, тобто близько 9 000 об'єктів за секунду. Тепер записи
+   * та їхні три точки живуть стільки, скільки живе клієнт, а кадр лише
+   * перезаписує в них числа.
+   */
+  interface MutablePoint {
+    x: number;
+    y: number;
+  }
+
+  interface ViewRecord extends ViewEntity {
+    pos: MutablePoint;
+    previousPos: MutablePoint;
+    vel: MutablePoint;
+  }
+
+  const viewPool: ViewRecord[] = [];
+  const byIdCache = new Map<EntityId, (typeof snapshots)[number]["entities"][number]>();
+  const view: ViewEntity[] = [];
+  let viewUsed = 0;
+
+  function takeRecord(): ViewRecord {
+    const existing = viewPool[viewUsed];
+    viewUsed += 1;
+    if (existing) return existing;
+    const fresh: ViewRecord = {
+      id: entityId(0),
+      kind: "ship",
+      pos: { x: 0, y: 0 },
+      previousPos: { x: 0, y: 0 },
+      vel: { x: 0, y: 0 },
+      angle: 0,
+      previousAngle: 0,
+      radius: 0,
+    };
+    viewPool.push(fresh);
+    return fresh;
+  }
 
   // Назва навмисно не `window`: у браузері це глобальний об'єкт, і
   // затінювати його локальною змінною — найкращий спосіб згодом
@@ -347,8 +397,12 @@ export function createNetcode({ link, getInput }: { link: Link; getInput: () => 
    * джерел: передбачення (своє) та інтерполяції (чуже).
    */
   function buildView(): ViewEntity[] {
-    const out: ViewEntity[] = [];
-    if (!world || !ship) return out;
+    // Масив і записи — ті самі, що минулого кадру. Обнуляємо лічильники,
+    // а не створюємо нове.
+    view.length = 0;
+    viewUsed = 0;
+    byIdCache.clear();
+    if (!world || !ship) return view;
     const now = performance.now();
     const renderServerTime = (clockOffsetMs ?? 0) + now - options.interpDelayMs;
     const [a, b] = framesAround(renderServerTime);
@@ -356,57 +410,71 @@ export function createNetcode({ link, getInput }: { link: Link; getInput: () => 
     if (a && b) {
       const span = b.serverTimeMs - a.serverTimeMs;
       const t = span > 0 ? Math.max(0, Math.min(1, (renderServerTime - a.serverTimeMs) / span)) : 0;
-      const byId = new Map(b.entities.map((e) => [e.id, e]));
+      for (const e of b.entities) byIdCache.set(e.id, e);
 
       for (const from of a.entities) {
         // Своє не беремо зі знімка: корабель і кулі вже намальовані
         // з передбачення, без затримки.
         if (from.you) continue;
-        const to = byId.get(from.id) ?? from;
-        out.push({
-          id: from.id,
-          kind: from.kind,
-          pos: new Vector2(lerp(from.x, to.x, t), lerp(from.y, to.y, t)),
-          previousPos: new Vector2(from.x, from.y),
-          vel: new Vector2(from.vx, from.vy),
-          angle: lerpAngle(from.angle, to.angle, t),
-          previousAngle: from.angle,
-          radius: from.radius,
-          hp: from.hp,
-          thrusting: from.thrusting,
-          hunting: from.hunting,
-          homingEnabled: from.homingEnabled,
-          invulnerable: from.invulnerable,
-          remote: true,
-        });
+        const to = byIdCache.get(from.id) ?? from;
+        const record = takeRecord();
+        record.id = from.id;
+        record.kind = from.kind;
+        record.pos.x = lerp(from.x, to.x, t);
+        record.pos.y = lerp(from.y, to.y, t);
+        record.previousPos.x = from.x;
+        record.previousPos.y = from.y;
+        record.vel.x = from.vx;
+        record.vel.y = from.vy;
+        record.angle = lerpAngle(from.angle, to.angle, t);
+        record.previousAngle = from.angle;
+        record.radius = from.radius;
+        record.hp = from.hp;
+        record.thrusting = from.thrusting;
+        record.hunting = from.hunting;
+        record.homingEnabled = from.homingEnabled;
+        record.invulnerable = from.invulnerable;
+        record.remote = true;
+        record.mine = false;
+        record.label = undefined;
+        view.push(record);
       }
     }
 
     // Своє — з передбаченого світу, плюс згладжена поправка.
     for (const entity of world) {
       if (entity.kind === "explosion") continue;
-      const offset = entity === ship ? correction : new Vector2(0, 0);
-      out.push({
-        id: entity.id,
-        kind: entity.kind,
-        pos: entity.pos.add(offset),
-        previousPos: (entity.previousPos ?? entity.pos).add(offset),
-        vel: entity.vel,
-        angle: entity.angle,
-        previousAngle: entity.previousAngle ?? entity.angle,
-        radius: entity.radius,
-        // instanceof звужує тип: hp і thrusting є лише в корабля,
-        // homingEnabled — лише в кулі. Раніше тут просто читалося
-        // undefined, і рендер мовчки малював кулю як звичайну.
-        hp: entity instanceof Ship ? entity.hp : undefined,
-        thrusting: entity instanceof Ship ? entity.thrusting : false,
-        invulnerable: entity instanceof Ship ? entity.invulnerable : false,
-        homingEnabled: entity instanceof Bullet ? entity.homingEnabled : false,
-        mine: true,
-      });
+      const isMine = entity === ship;
+      const ox = isMine ? correction.x : 0;
+      const oy = isMine ? correction.y : 0;
+      const previous = entity.previousPos ?? entity.pos;
+      const record = takeRecord();
+      record.id = entity.id;
+      record.kind = entity.kind;
+      record.pos.x = entity.pos.x + ox;
+      record.pos.y = entity.pos.y + oy;
+      record.previousPos.x = previous.x + ox;
+      record.previousPos.y = previous.y + oy;
+      record.vel.x = entity.vel.x;
+      record.vel.y = entity.vel.y;
+      record.angle = entity.angle;
+      record.previousAngle = entity.previousAngle ?? entity.angle;
+      record.radius = entity.radius;
+      // instanceof звужує тип: hp і thrusting є лише в корабля,
+      // homingEnabled — лише в кулі. Раніше тут просто читалося
+      // undefined, і рендер мовчки малював кулю як звичайну.
+      record.hp = entity instanceof Ship ? entity.hp : undefined;
+      record.thrusting = entity instanceof Ship ? entity.thrusting : false;
+      record.invulnerable = entity instanceof Ship ? entity.invulnerable : false;
+      record.homingEnabled = entity instanceof Bullet ? entity.homingEnabled : false;
+      record.hunting = false;
+      record.remote = false;
+      record.mine = true;
+      record.label = undefined;
+      view.push(record);
     }
 
-    return out;
+    return view;
   }
 
   return {

@@ -1,5 +1,9 @@
 import { type EntityId, type EntityKind, entityId } from "../types.ts";
 import { WORLD, wrap } from "./arena.ts";
+
+const HALF_WIDTH = WORLD.width / 2;
+const HALF_HEIGHT = WORLD.height / 2;
+
 import { Vector2 } from "./vector.ts";
 import type { WorldEvent, WorldEvents } from "./world.ts";
 
@@ -36,7 +40,11 @@ export class Entity {
   /** Приватний статичний лічильник — ззовні до нього не дістатися. */
   static #nextId = 1;
 
-  readonly id: EntityId;
+  /**
+   * Не readonly лише через пул: об'єкт, узятий із пулу, отримує новий
+   * id, бо для решти гри це НОВА сутність. Поза reset() id не змінюють.
+   */
+  id: EntityId;
   pos: Vector2;
   vel: Vector2;
   radius: number;
@@ -68,6 +76,32 @@ export class Entity {
     this.previousAngle = angle;
   }
 
+  /**
+   * Повернути об'єкт у стан «щойно створений» — для повторного
+   * використання з пулу. Новий id навмисно: клієнт і сервер звіряють
+   * сутності за id, і стара куля не має «ожити» під тим самим номером.
+   */
+  resetEntity({
+    pos = Vector2.zero(),
+    vel = Vector2.zero(),
+    radius = 10,
+    kind = "ship",
+    angle = 0,
+    behaviors = [],
+  }: EntityOptions = {}): void {
+    this.id = entityId(Entity.#nextId++);
+    this.pos = pos;
+    this.vel = vel;
+    this.radius = radius;
+    this.kind = kind;
+    this.angle = angle;
+    this.behaviors = behaviors;
+    this.previousPos = pos;
+    this.previousAngle = angle;
+    this.alive = true;
+    this.phase = undefined;
+  }
+
   update(dt: number, world: WorldLike): void {
     for (const behavior of this.behaviors) behavior.update?.(this, dt, world);
     this.pos = new Vector2(
@@ -81,7 +115,23 @@ export class Entity {
     this.alive = false;
   }
 
+  /**
+   * Перевірка дотику БЕЗ виділення пам'яті.
+   *
+   * Раніше тут було `pos.wrappedDistanceTo(other.pos)`, а це два нові
+   * Vector2 і один Math.hypot на кожну пару. У профілі це дало 40%
+   * часу кроку (`shortestDeltaTo` 20.4% + `get length` 20.7%).
+   * Тут та сама математика на числах і без кореня: порівнюємо
+   * квадрати відстаней.
+   */
   intersects(other: Entity): boolean {
-    return this.pos.wrappedDistanceTo(other.pos) < this.radius + other.radius;
+    let dx = Math.abs(this.pos.x - other.pos.x);
+    let dy = Math.abs(this.pos.y - other.pos.y);
+    // Арена — тор: через край може бути ближче, ніж навпростець.
+    if (dx > HALF_WIDTH) dx = WORLD.width - dx;
+    if (dy > HALF_HEIGHT) dy = WORLD.height - dy;
+
+    const reach = this.radius + other.radius;
+    return dx * dx + dy * dy < reach * reach;
   }
 }

@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import { test } from "node:test";
+import { expect, test } from "vitest";
 import { createRng } from "../src/rng.ts";
 import { createGame } from "../src/sim/rules.ts";
 import type { InputState } from "../src/types.ts";
@@ -41,11 +40,11 @@ function run(seed: number, steps: number): string {
 }
 
 test("той самий seed і той самий вхід дають той самий стан", () => {
-  assert.equal(run(1234, 300), run(1234, 300));
+  expect(run(1234, 300)).toBe(run(1234, 300));
 });
 
 test("інший seed дає інший стан", () => {
-  assert.notEqual(run(1234, 300), run(5678, 300));
+  expect(run(1234, 300)).not.toBe(run(5678, 300));
 });
 
 test("генератор відтворюється зі збереженого стану", () => {
@@ -56,7 +55,7 @@ test("генератор відтворюється зі збереженого 
 
   const b = createRng(1);
   b.state = saved;
-  assert.deepEqual([b.next(), b.next(), b.next()], expected);
+  expect([b.next(), b.next(), b.next()]).toEqual(expected);
 });
 
 test("симуляція не використовує Math.random", () => {

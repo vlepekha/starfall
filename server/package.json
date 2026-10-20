@@ -14,7 +14,13 @@
     "check:paths": "node tools/path-check.mjs",
     "check:net": "node tools/net-check.mjs",
     "typecheck": "tsc --noEmit -p .",
-    "dev:env": "node --env-file=.env --watch src/index.ts"
+    "dev:env": "node --env-file=.env --watch src/index.ts",
+    "load": "node tools/load-test.mjs",
+    "bench:step": "node tools/bench-step.mjs",
+    "profile": "node --cpu-prof --cpu-prof-dir=../profiles tools/bench-step.mjs 128",
+    "profile:report": "node tools/profile-report.mjs",
+    "bots": "node tools/bots.mjs",
+    "bench:load": "node tools/load-test.mjs"
   },
   "dependencies": {
     "@starfall/shared": "*",

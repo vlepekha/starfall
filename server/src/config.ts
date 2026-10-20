@@ -31,6 +31,7 @@ const envSchema = z.object({
   PING_INTERVAL_MS: intInRange(1_000, 120_000, 15_000),
   MISSED_PONG_LIMIT: intInRange(1, 10, 2),
   MAX_BUFFERED_BYTES: intInRange(1024, 16 << 20, 256 * 1024),
+  ROOM_CAPACITY: intInRange(2, 256, 6),
 });
 
 export class ConfigError extends Error {
@@ -51,6 +52,8 @@ export interface Config {
   readonly pingIntervalMs: number;
   readonly missedPongLimit: number;
   readonly maxBufferedBytes: number;
+  /** Скільки гравців уміщає кімната. Для навантажувальних тестів піднімають. */
+  readonly roomCapacity: number;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -80,6 +83,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     pingIntervalMs: raw.PING_INTERVAL_MS,
     missedPongLimit: raw.MISSED_PONG_LIMIT,
     maxBufferedBytes: raw.MAX_BUFFERED_BYTES,
+    roomCapacity: raw.ROOM_CAPACITY,
   };
 
   mkdirSync(config.logDir, { recursive: true });

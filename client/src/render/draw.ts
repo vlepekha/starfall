@@ -15,6 +15,16 @@ export interface RenderAssets {
   images: Map<string, Sheet>;
 }
 
+/** Підпис функції, що малює одну копію сутності. */
+type DrawOne = (
+  entity: ViewEntity,
+  x: number,
+  y: number,
+  time: number,
+  ghost: boolean,
+  angle: number,
+) => void;
+
 interface Point {
   x: number;
   y: number;
@@ -136,20 +146,33 @@ export function createRenderer(
     ctx.restore();
   }
 
+  /**
+   * Одна точка на весь рендер.
+   *
+   * Було: новий об'єкт і два замикання `lerp` на кожну сутність кожного
+   * кадру — при 37 сутностях це 111 об'єктів за кадр лише тут.
+   * Тепер координати пишуться в цю саму точку; вона читається одразу
+   * ж, до наступного виклику, тому спільний стан безпечний.
+   */
+  const scratch: { x: number; y: number } = { x: 0, y: 0 };
+
+  function lerpAxis(from: number, to: number, max: number, alpha: number): number {
+    let delta = to - from;
+    if (delta > max / 2) delta -= max;
+    if (delta < -max / 2) delta += max;
+    let value = from + delta * alpha;
+    if (value < 0) value += max;
+    if (value >= max) value -= max;
+    return value;
+  }
+
   /** Лінійна інтерполяція позиції між двома кроками симуляції (з лаби 1). */
   function lerpPosition(entity: ViewEntity, alpha: number): Point {
     const a = entity.previousPos ?? entity.pos;
     const b = entity.pos;
-    const lerp = (from: number, to: number, max: number): number => {
-      let delta = to - from;
-      if (delta > max / 2) delta -= max;
-      if (delta < -max / 2) delta += max;
-      let value = from + delta * alpha;
-      if (value < 0) value += max;
-      if (value >= max) value -= max;
-      return value;
-    };
-    return { x: lerp(a.x, b.x, WORLD.width), y: lerp(a.y, b.y, WORLD.height) };
+    scratch.x = lerpAxis(a.x, b.x, WORLD.width, alpha);
+    scratch.y = lerpAxis(a.y, b.y, WORLD.height, alpha);
+    return scratch;
   }
 
   /**
@@ -316,7 +339,7 @@ export function createRenderer(
 
   /** Вектор швидкості — службова підказка, добре читає фізику. */
   function drawVelocity(ship: ViewEntity, at: Point): void {
-    const speed = ship.vel.length;
+    const speed = Math.hypot(ship.vel.x, ship.vel.y);
     if (speed < 20) return;
     ctx.save();
     ctx.translate(at.x, at.y);
@@ -345,9 +368,17 @@ export function createRenderer(
     ctx.fillRect(0, 0, WORLD.width, WORLD.height);
   }
 
-  /** Малює одну сутність у 9 копіях (3x3) — через «загортання» арени. */
+  /**
+   * Малює одну сутність у 9 копіях (3x3) — через «загортання» арени.
+   *
+   * Сутність і кут передаємо аргументами, а не через замикання: раніше
+   * кожен виклик створював нову стрілочну функцію, тобто ще 37 об'єктів
+   * за кадр.
+   */
   function drawWrapped(
-    draw: (x: number, y: number, time: number, ghost: boolean) => void,
+    draw: DrawOne,
+    entity: ViewEntity,
+    angle: number,
     pos: Point,
     time: number,
   ): void {
@@ -357,7 +388,7 @@ export function createRenderer(
         const gy = pos.y + oy * WORLD.height;
         if (gx < -80 || gx > WORLD.width + 80) continue;
         if (gy < -80 || gy > WORLD.height + 80) continue;
-        draw(gx, gy, time, ox !== 0 || oy !== 0);
+        draw(entity, gx, gy, time, ox !== 0 || oy !== 0, angle);
       }
     }
   }
@@ -385,17 +416,17 @@ export function createRenderer(
           drawExplosion(entity);
           break;
         case "bullet":
-          drawWrapped((x, y, t, ghost) => drawBullet(entity, x, y, t, ghost, angle), at, time);
+          drawWrapped(drawBullet, entity, angle, at, time);
           break;
         case "asteroid":
-          drawWrapped((x, y, t, ghost) => drawAsteroid(entity, x, y, t, ghost, angle), at, time);
+          drawWrapped(drawAsteroid, entity, angle, at, time);
           break;
         case "pickup":
-          drawWrapped((x, y, t, ghost) => drawPickup(entity, x, y, t, ghost), at, time);
+          drawWrapped(drawPickup, entity, angle, at, time);
           break;
         case "ship":
           if (showVelocity) drawVelocity(entity, at);
-          drawWrapped((x, y, t, ghost) => drawShip(entity, x, y, t, ghost, angle), at, time);
+          drawWrapped(drawShip, entity, angle, at, time);
           break;
         default:
           break;
