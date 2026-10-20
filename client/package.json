@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "assets": "node tools/make-assets.mjs",
     "bench:physics": "node tools/determinism.js",
-    "make:gif": "node tools/make-gif.mjs"
+    "make:gif": "node tools/make-gif.mjs",
+    "typecheck": "tsc --noEmit -p ."
   },
   "devDependencies": {
     "vite": "^8.3.0"

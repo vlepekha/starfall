@@ -20,7 +20,8 @@
     "bench:blocking": "npm run bench:blocking --workspace server",
     "lint": "biome check .",
     "format": "biome format --write .",
-    "typecheck": "tsc -p shared && tsc -p server && tsc -p client"
+    "typecheck": "tsc -p shared && tsc -p server && tsc -p client",
+    "test": "npm run test --workspace @starfall/shared"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.13",

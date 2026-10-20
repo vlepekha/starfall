@@ -27,6 +27,10 @@ jobs:
       - name: Лінтер і формат
         run: npm run lint
 
+      # Детермінізм, кодек і перевірка, що shared вантажиться без DOM.
+      - name: Тести shared
+        run: npm test
+
       - name: Збірка клієнта
         run: npm run build
 

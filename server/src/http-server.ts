@@ -102,6 +102,7 @@ export interface HttpServerOptions {
   startedAt: number;
   getConnections: () => number;
   getMatches?: () => unknown[];
+  getMatchStats?: () => unknown[];
 }
 
 export function createHttpServer({
@@ -110,6 +111,7 @@ export function createHttpServer({
   startedAt,
   getConnections,
   getMatches,
+  getMatchStats,
 }: HttpServerOptions): Server {
   const server = createServer(async (req, res) => {
     /**
@@ -142,6 +144,23 @@ export function createHttpServer({
           matches: getMatches?.() ?? [],
           rss: process.memoryUsage().rss,
           pid: process.pid,
+        });
+      }
+
+      /**
+       * Статистика симуляції: тривалість тіка і джитер.
+       * Саме вона першою показує, що серверу перестає вистачати часу —
+       * задовго до того, як це помітять гравці.
+       */
+      if (url.pathname === "/api/stats") {
+        return json(res, 200, {
+          uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
+          tickHz: 30,
+          matches: getMatchStats?.() ?? [],
+          memory: {
+            rssMb: +(process.memoryUsage().rss / 1024 / 1024).toFixed(1),
+            heapUsedMb: +(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1),
+          },
         });
       }
 

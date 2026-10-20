@@ -8,9 +8,14 @@
     ".": "./src/index.ts",
     "./protocol": "./src/protocol.ts",
     "./messages": "./src/messages.ts",
-    "./types": "./src/types.ts"
+    "./types": "./src/types.ts",
+    "./codec": "./src/codec.ts"
   },
   "dependencies": {
     "zod": "^4.6.7"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "node --test \"test/*.test.ts\""
   }
 }

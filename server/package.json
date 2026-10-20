@@ -12,7 +12,9 @@
     "check:proto": "node tools/proto-check.mjs",
     "demo:error": "node tools/error-demo.mjs",
     "check:paths": "node tools/path-check.mjs",
-    "check:net": "node tools/net-check.mjs"
+    "check:net": "node tools/net-check.mjs",
+    "typecheck": "tsc --noEmit -p .",
+    "dev:env": "node --env-file=.env --watch src/index.ts"
   },
   "dependencies": {
     "@starfall/shared": "*",

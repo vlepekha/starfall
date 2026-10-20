@@ -72,6 +72,15 @@ export class Match {
   tick: Tick = tick(0);
   lastTickMs = 0;
 
+  /**
+   * Останні 120 тіків (4 секунди) — для /api/stats.
+   * Нас цікавить не середнє, а розкид: рівний сервер із середнім 1 мс
+   * і піками по 40 мс грається гірше за рівний із середнім 5 мс.
+   */
+  readonly #durations: number[] = [];
+  readonly #intervals: number[] = [];
+  #lastTickAt = 0;
+
   constructor({ roomId, seed = (Math.random() * 2 ** 32) >>> 0, onSnapshot }: MatchOptions) {
     this.roomId = roomId;
     this.seed = seed >>> 0;
@@ -199,7 +208,43 @@ export class Match {
     for (const player of this.#players.values()) this.onSnapshot?.(player, payload);
 
     this.lastTickMs = Date.now() - startedAt;
+    this.#record(this.lastTickMs, startedAt);
     this.#scheduleNext();
+  }
+
+  #record(durationMs: number, startedAt: number): void {
+    this.#durations.push(durationMs);
+    if (this.#lastTickAt) this.#intervals.push(startedAt - this.#lastTickAt);
+    this.#lastTickAt = startedAt;
+    while (this.#durations.length > 120) this.#durations.shift();
+    while (this.#intervals.length > 120) this.#intervals.shift();
+  }
+
+  /** Статистика тіків: середнє, p95 і джитер (стандартне відхилення інтервалу). */
+  get stats() {
+    const avg = (xs: number[]): number =>
+      xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+    const p95 = (xs: number[]): number => {
+      if (!xs.length) return 0;
+      const sorted = [...xs].sort((a, b) => a - b);
+      return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))] ?? 0;
+    };
+    const meanInterval = avg(this.#intervals);
+    const variance = this.#intervals.length
+      ? avg(this.#intervals.map((x) => (x - meanInterval) ** 2))
+      : 0;
+
+    return {
+      room: this.roomId,
+      tick: this.tick,
+      players: this.playerCount,
+      tickMsAvg: +avg(this.#durations).toFixed(3),
+      tickMsP95: +p95(this.#durations).toFixed(3),
+      intervalMsAvg: +meanInterval.toFixed(2),
+      /** Джитер: наскільки нерівно лягають тіки. Ідеал — 0 при 33.33 мс. */
+      jitterMs: +Math.sqrt(variance).toFixed(2),
+      droppedInputs: [...this.#players.values()].reduce((a, p) => a + p.droppedInputs, 0),
+    };
   }
 
   /** Пакування знімка персонально для гравця: свій ackSeq і свій "you". */

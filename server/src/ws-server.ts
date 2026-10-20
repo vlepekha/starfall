@@ -9,6 +9,9 @@ import { Match, type Player, type TickPayload } from "./match.ts";
 import { createMatchLog, type LogEvent } from "./match-log.ts";
 import type { Room, RoomRegistry } from "./room.ts";
 
+/** Скільки кімнат сервер готовий тримати одночасно. */
+const MAX_ROOMS = 32;
+
 const encode = (type: string, payload: Record<string, unknown> = {}): string =>
   JSON.stringify({ type, ...payload });
 
@@ -19,8 +22,9 @@ interface SocketState {
   name: string | null;
   missedPongs: number;
   dropped: number;
-  windowStart: number;
-  windowCount: number;
+  /** Токени для обмеження частоти (token bucket). */
+  tokens: number;
+  lastRefill: number;
   bytesIn: number;
   bytesOut: number;
   readonly json: boolean;
@@ -48,7 +52,16 @@ export interface MatchInfo {
  * з конкретним кодом.
  */
 export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }: WsOptions) {
-  const wss = new WebSocketServer({ server: httpServer, path: "/ws" });
+  /**
+   * maxPayload — захист на рівні бібліотеки: кадри більші за ліміт
+   * ws відкидає сам, не збираючи їх у пам'яті. Наша перевірка в
+   * parseClientMessage лишається другою лінією (і дає зрозумілий код).
+   */
+  const wss = new WebSocketServer({
+    server: httpServer,
+    path: "/ws",
+    maxPayload: config.maxMessageBytes,
+  });
   const sockets = new Map<WebSocket, SocketState>();
   /** Один матч на кімнату. Створюється на першому гравцеві. */
   const matches = new Map<string, Match>();
@@ -137,8 +150,8 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
       name: null,
       missedPongs: 0,
       dropped: 0,
-      windowStart: Date.now(),
-      windowCount: 0,
+      tokens: config.messagesPerSecond,
+      lastRefill: Date.now(),
       bytesIn: 0,
       bytesOut: 0,
       json: new URL(request.url ?? "/", "http://localhost").searchParams.get("proto") === "json",
@@ -179,17 +192,24 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
   });
 
   function handleMessage(socket: WebSocket, state: SocketState, raw: Uint8Array): void {
-    // 1. Обмеження частоти — до будь-якого розбору.
+    /**
+     * 1. Обмеження частоти — до будь-якого розбору.
+     *
+     * Token bucket, а не лічильник у вікні: вікно дозволяє надіслати
+     * подвійну норму на стику двох секунд (20 наприкінці однієї і 20
+     * на початку наступної). Тут токени поповнюються рівномірно, тож
+     * сплеск обмежений розміром відра.
+     */
     const now = Date.now();
-    if (now - state.windowStart >= 1000) {
-      state.windowStart = now;
-      state.windowCount = 0;
-    }
-    state.windowCount += 1;
-    if (state.windowCount > config.messagesPerSecond) {
+    const elapsed = (now - state.lastRefill) / 1000;
+    state.lastRefill = now;
+    state.tokens = Math.min(config.messagesPerSecond, state.tokens + elapsed * config.messagesPerSecond);
+
+    if (state.tokens < 1) {
       socket.close(CLOSE.RATE_LIMIT, "too many messages");
       return;
     }
+    state.tokens -= 1;
 
     // 2. Розмір, JSON, форма й відомий тип — усе в одній схемі Zod.
     const result = parseClientMessage(raw, { maxBytes: config.maxMessageBytes });
@@ -233,6 +253,13 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
       return;
     }
     clearTimeout(state.joinTimer);
+
+    // Ліміт кімнат: інакше будь-хто створить тисячу порожніх матчів,
+    // кожен зі своїм таймером і файлом логу.
+    if (!rooms.get(roomId) && rooms.size >= MAX_ROOMS) {
+      socket.close(CLOSE.BAD_SHAPE, "too many rooms");
+      return;
+    }
 
     const room = rooms.ensure(roomId);
     if (!room.add({ id: state.id, name })) {
@@ -310,6 +337,10 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
         players: m.playerCount,
         lastTickMs: m.lastTickMs,
       }));
+    },
+    /** Докладна статистика тіків для /api/stats. */
+    get matchStats() {
+      return [...matches.values()].map((m) => m.stats);
     },
     async close(): Promise<void> {
       clearInterval(pingTimer);

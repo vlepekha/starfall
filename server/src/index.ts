@@ -26,6 +26,7 @@ const httpServer = createHttpServer({
   startedAt,
   getConnections: () => ws.connections,
   getMatches: () => ws.matches,
+  getMatchStats: () => ws.matchStats,
 });
 
 const ws = attachWebSocket(httpServer, {
