@@ -1,11 +1,20 @@
 import "./style.css";
+import { activeFailure, FAILURES } from "./assets/failures.js";
+import { loadAll } from "./assets/load-all.js";
+import { loadJson } from "./assets/loaders.js";
+import { createAudio } from "./audio/audio.js";
 import { runBenchmark } from "./bench.js";
+import { GameBus } from "./bus.js";
 import { burnMilliseconds, EXPERIMENTS } from "./experiments.js";
 import { createInput } from "./input.js";
+import { Lobby } from "./lobby/lobby.js";
+import { createLobbyView } from "./lobby/lobby-dom.js";
 import { createLoop } from "./loop.js";
 import { createIntervalLoop, createVariableLoop } from "./loop-variants.js";
+import { runPuzzles } from "./puzzles.js";
 import { createRenderer } from "./render/draw.js";
 import { createHud } from "./render/hud.js";
+import { createLoadingScreen } from "./render/loading.js";
 import { createGame } from "./sim/rules.js";
 import { demonstrateThisBug } from "./this-demo.js";
 
@@ -15,41 +24,151 @@ const modeSelect = document.querySelector("#mode");
 const blockInput = document.querySelector("#block-ms");
 const noteEl = document.querySelector("#note");
 const logEl = document.querySelector("#log");
+const lobbyRoot = document.querySelector("#lobby");
+const retryButton = document.querySelector("#retry");
+const soundButton = document.querySelector("#sound");
+const stageEl = document.querySelector(".stage");
 
+const bus = new GameBus();
 const input = createInput();
-const renderer = createRenderer(canvas);
-const hud = createHud(hudRoot);
-const game = createGame({ onEvent: logEvent });
+const audio = createAudio({ bus });
+const loading = createLoadingScreen(canvas);
 
-/**
- * Корабель не знає про клавіатуру — йому підсовують функцію-джерело вводу.
- * Стрілка тут не випадкова: вона не має власного this, тому всередині
- * залишається this із цього модуля, а не з об'єкта, який її викликав.
- */
-game.ship.controller = () => input.snapshot();
-
+let assets = null;
+let renderer = null;
+let hud = null;
+let game = null;
 let loop = null;
 let mode = "none";
 
+/* ------------------------------------------------------------------ */
+/*  Крок 1. Завантаження ассетів                                        */
+/* ------------------------------------------------------------------ */
+
+let loadController = null;
+
+async function loadAssets() {
+  loadController?.abort();
+  loadController = new AbortController();
+  const signal = loadController.signal;
+  const failure = activeFailure();
+
+  const items = new Map();
+  const draw = (extra = {}) =>
+    loading.draw({
+      items: [...items.entries()].map(([id, value]) => ({ id, value })),
+      ...extra,
+    });
+
+  retryButton.hidden = true;
+  draw({
+    ratio: 0,
+    label: failure === "none" ? "завантаження…" : `режим збою: ${FAILURES[failure]}`,
+  });
+
+  try {
+    const manifest = await loadJson("/assets/manifest.json", { signal, timeout: 2500 });
+    for (const entry of [...manifest.images, ...manifest.audio, ...manifest.data]) {
+      items.set(entry.id, 0);
+    }
+    draw({ ratio: 0, label: "завантаження…" });
+
+    // Збій «гравець пішов»: обриваємо завантаження посеред процесу.
+    if (failure === "abort") {
+      setTimeout(
+        () => loadController.abort(new DOMException("Користувач вийшов", "AbortError")),
+        350,
+      );
+    }
+
+    assets = await loadAll(manifest, {
+      signal,
+      onProgress: ({ id, value, ratio, done, total }) => {
+        items.set(id, value);
+        draw({ ratio, label: `${done}/${total} файлів` });
+      },
+      onRetry: ({ id, attempt, delay }) => {
+        draw({ ratio: 0, label: `повтор ${id}: спроба ${attempt} через ${delay} мс` });
+        logEvent("load-retry", { text: `${id}: спроба ${attempt} через ${delay} мс` });
+      },
+    });
+
+    for (const [id, value] of assets.audio) audio.register(id, value);
+    draw({ ratio: 1, label: "готово" });
+    return true;
+  } catch (error) {
+    // Жоден збій не має вбивати сторінку: показуємо причину й кнопку Retry.
+    const reason =
+      error.name === "AbortError"
+        ? "завантаження перервано"
+        : error.name === "TimeoutError"
+          ? "сервер не відповів"
+          : error.message;
+    draw({ ratio: 0, error: reason });
+    logEvent("load-error", { text: reason });
+    retryButton.hidden = false;
+    // Усе, що ще летить після першої помилки, більше не потрібне.
+    loadController.abort();
+    return false;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Крок 2. Лобі                                                        */
+/* ------------------------------------------------------------------ */
+
+const lobby = new Lobby();
+const lobbyView = createLobbyView(lobbyRoot, lobby, { onJoin: startGame });
+
+function showLobby() {
+  stageEl.hidden = true;
+  lobbyView.show();
+  lobby.start();
+}
+
+/* ------------------------------------------------------------------ */
+/*  Крок 3. Гра                                                         */
+/* ------------------------------------------------------------------ */
+
+const ARENA_PRESETS = {
+  classic: {},
+  dense: { asteroidLimit: 18, asteroidInterval: [1.2, 2.4] },
+  sparse: { asteroidLimit: 6, asteroidInterval: [4, 7], pickupInterval: [6, 10] },
+};
+
+async function startGame({ name, room }) {
+  lobbyView.hide();
+  stageEl.hidden = false;
+
+  // Клік по Join — це жест користувача, єдиний момент, коли браузер
+  // дозволить запустити AudioContext. Пізніше такої нагоди не буде.
+  await audio.unlock();
+  soundButton.hidden = false;
+  soundButton.textContent = audio.muted ? "Sound off" : "Sound on";
+
+  const config = { ...assets.data.get("arena"), ...(ARENA_PRESETS[room?.arena] ?? {}) };
+  game = createGame({ bus, config, onEvent: logEvent });
+  game.ship.controller = () => input.snapshot();
+
+  renderer = createRenderer(canvas, { assets });
+  hud = createHud(hudRoot);
+  logEvent("joined", { text: `${name} → ${room?.name ?? "локальна арена"}` });
+
+  applyMode("none");
+  demonstrateThisBug(game.ship, game.world);
+}
+
 function update(dt) {
-  // Дія-подія: одне спрацювання на натискання, скільки б кроків клавішу
-  // не тримали. Саме для цього в createInput є justPressed.
   if (input.justPressed("debug")) {
     const on = renderer.toggleVelocity();
     logEvent("debug", { text: `вектор швидкості ${on ? "увімкнено" : "вимкнено"}` });
   }
-
   game.step(dt);
-
-  // «Свіжі» натискання живуть рівно один крок симуляції.
   input.endStep();
 }
 
 function render(alpha) {
-  // Експеримент 1 з лаби 1: синхронна робота всередині кадру.
-  if (mode === "block") {
-    burnMilliseconds(Number(blockInput.value) || 0);
-  }
+  if (mode === "block") burnMilliseconds(Number(blockInput.value) || 0);
   renderer.render(game.world, mode === "variable" ? 1 : alpha);
   hud.update(loop.stats, game, EXPERIMENTS[mode].label, performance.now());
 }
@@ -70,6 +189,10 @@ function applyMode(next) {
   blockInput.disabled = mode !== "block";
 }
 
+/* ------------------------------------------------------------------ */
+/*  Інтерфейс                                                           */
+/* ------------------------------------------------------------------ */
+
 for (const [value, meta] of Object.entries(EXPERIMENTS)) {
   const option = document.createElement("option");
   option.value = value;
@@ -79,35 +202,22 @@ for (const [value, meta] of Object.entries(EXPERIMENTS)) {
 modeSelect.value = "none";
 modeSelect.addEventListener("change", (event) => applyMode(event.target.value));
 
-/* ------------------------------------------------------------------ */
-/*  Баг із this: кнопка «Fire» у шапці                                  */
-/* ------------------------------------------------------------------ */
-
 const fireButton = document.querySelector("#fire");
 const brokenToggle = document.querySelector("#broken-this");
 
 /**
  * НАВМИСНО зламаний варіант — рівно те, що хочеться написати першим:
- *
  *     fireButton.addEventListener("click", game.ship.fire);
- *
- * Метод відривається від об'єкта. При виклику слухача this буде кнопкою
- * (для addEventListener — currentTarget), а в модулях діє strict mode,
- * тож ніякої підміни на window не станеться. Звернення до приватного #hp
- * або до this.pos кине TypeError.
+ * Метод відривається від об'єкта, і this стає кнопкою. Деталі — у README.
  */
-const brokenFire = game.ship.fire;
-
-/** Правильний варіант: стрілка бере this із замикання. */
-const workingFire = () => game.ship.fire(game.world);
-
 fireButton.addEventListener("click", (event) => {
+  if (!game) return;
   if (!brokenToggle.checked) {
-    workingFire();
+    game.ship.fire(game.world);
     return;
   }
   try {
-    // Імітуємо саме той випадок: виклик без прив'язки до корабля.
+    const brokenFire = game.ship.fire;
     brokenFire.call(event.currentTarget, game.world);
     logEvent("this", { text: "несподівано спрацювало" });
   } catch (error) {
@@ -115,7 +225,13 @@ fireButton.addEventListener("click", (event) => {
   }
 });
 
-/* ------------------------------------------------------------------ */
+retryButton.addEventListener("click", async () => {
+  if (await loadAssets()) showLobby();
+});
+
+soundButton.addEventListener("click", () => {
+  soundButton.textContent = audio.toggleMute() ? "Sound off" : "Sound on";
+});
 
 const benchButton = document.querySelector("#bench");
 
@@ -139,7 +255,6 @@ async function startBenchmark() {
 
 benchButton.addEventListener("click", startBenchmark);
 
-// ?bench=1 — автопрогін одразу після завантаження (зручно для скриптів і CI).
 if (new URLSearchParams(window.location.search).has("bench")) {
   window.addEventListener("load", () => {
     startBenchmark().then(() => {
@@ -148,9 +263,9 @@ if (new URLSearchParams(window.location.search).has("bench")) {
   });
 }
 
-document.querySelector("#reset").addEventListener("click", () => game.reset());
+document.querySelector("#reset").addEventListener("click", () => game?.reset());
 
-/** Стрічка подій під ареною: влучання, смерті, бонуси. */
+/** Стрічка подій під ареною. */
 function logEvent(type, payload = {}) {
   const text =
     {
@@ -159,45 +274,61 @@ function logEvent(type, payload = {}) {
       respawn: () => "респаун, 2 с невразливості",
       score: () => `+${payload.amount} очок`,
       pickup: () => `підібрано ${payload.label}`,
-      shot: () => null,
+      joined: () => payload.text,
       debug: () => payload.text,
       this: () => `this: ${payload.text}`,
       "this-error": () => `this зламався — ${payload.text}`,
+      "load-error": () => `завантаження: ${payload.text}`,
+      "load-retry": () => `повтор ${payload.text}`,
+      fired: () => null,
+      exploded: () => null,
     }[type]?.() ?? null;
 
   if (!text || !logEl) return;
   const line = document.createElement("li");
   line.textContent = text;
-  if (type === "this-error") line.className = "is-bad";
+  if (type === "this-error" || type === "load-error") line.className = "is-bad";
   logEl.prepend(line);
   while (logEl.children.length > 6) logEl.lastChild.remove();
 }
 
-applyMode("none");
+/* ------------------------------------------------------------------ */
+/*  Старт                                                               */
+/* ------------------------------------------------------------------ */
 
-// Експеримент із this і ланцюжком прототипів — друкується в консоль при старті.
-demonstrateThisBug(game.ship, game.world);
+const params = new URLSearchParams(window.location.search);
 
-// Демонстрація порядку черг із лаби 1.
-console.log("1 sync");
-setTimeout(() => console.log("4 macrotask (setTimeout)"), 0);
-queueMicrotask(() => console.log("3 microtask (queueMicrotask)"));
-requestAnimationFrame(() => console.log("5 rAF (before paint)"));
-Promise.resolve().then(() => console.log("3.1 microtask (Promise)"));
-console.log("2 sync");
+if (params.has("puzzles")) {
+  runPuzzles();
+} else {
+  // Гра стартує ЛИШЕ після того, як усе завантажено.
+  stageEl.hidden = false;
+  lobbyView.hide();
+  loadAssets().then((ok) => {
+    if (ok) showLobby();
+  });
+}
 
-// Дебаг-хук: дозволяє знімати цифри й колупати світ прямо з консолі.
+// Дебаг-хук для замірів із консолі.
 window.starfall = {
   get stats() {
-    return loop.stats;
+    return loop?.stats;
   },
   get ship() {
-    return game.ship;
+    return game?.ship;
   },
   get world() {
-    return game.world;
+    return game?.world;
   },
-  game,
+  get assets() {
+    return assets;
+  },
+  bus,
+  audio,
+  lobby,
+  get game() {
+    return game;
+  },
   setMode(next) {
     modeSelect.value = next;
     applyMode(next);

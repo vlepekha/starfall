@@ -13,6 +13,16 @@ export class World {
   #entities = new Map();
   #spawnQueue = [];
   #listeners = new Map();
+  #bus = null;
+
+  /**
+   * Шина подій — необов'язкова. Світ лише кидає в неї події; хто слухає
+   * (звук, HUD, статистика) — його не стосується. Саме тому в sim/
+   * немає жодного імпорту з audio/ чи render/.
+   */
+  constructor({ bus } = {}) {
+    this.#bus = bus ?? null;
+  }
 
   /** Лічильники для HUD: за крок їх оновлює step(). */
   stats = { entities: 0, collisions: 0, score: 0, steps: 0 };
@@ -86,6 +96,7 @@ export class World {
 
   emit(event, payload) {
     for (const handler of this.#listeners.get(event) ?? []) handler(payload);
+    this.#bus?.emit(event, payload);
   }
 
   /**

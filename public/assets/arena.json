@@ -1,0 +1,12 @@
+{
+  "asteroidLimit": 12,
+  "pickupLimit": 2,
+  "asteroidInterval": [
+    2.5,
+    4.5
+  ],
+  "pickupInterval": [
+    9,
+    15
+  ]
+}

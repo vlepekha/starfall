@@ -175,7 +175,7 @@ export class Ship extends Entity {
     const bullet = useHoming ? Bullet.homing(options) : new Bullet(options);
 
     world.spawn(bullet);
-    world.emit("shot", { ship: this, bullet });
+    world.emit("fired", { ship: this, bullet });
     return bullet;
   }
 

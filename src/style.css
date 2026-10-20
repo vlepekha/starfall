@@ -310,3 +310,132 @@ kbd {
 .hud__value.is-good {
   color: #8affc1;
 }
+
+/* ---------- Лаба 3: лобі, кнопка Retry ---------- */
+
+.lobby {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lobby__title {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.lobby__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.lobby__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.lobby__field input {
+  width: 220px;
+  font-size: 14px;
+}
+
+.lobby__status {
+  font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--muted);
+}
+
+.lobby__status.is-bad {
+  color: var(--warn);
+}
+
+.lobby__rooms {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lobby__room {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(10, 17, 35, 0.6);
+  transition: border-color 0.15s ease;
+}
+
+.lobby__room:hover {
+  border-color: var(--line-strong);
+}
+
+.lobby__room-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lobby__arena {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.lobby__players {
+  font: 600 14px ui-monospace, Menlo, monospace;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.lobby__room button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lobby__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.retry {
+  align-self: flex-start;
+  border-color: var(--bad);
+  color: var(--bad);
+  font-weight: 600;
+}
+
+.retry:hover {
+  border-color: var(--bad);
+  background: rgba(255, 107, 125, 0.1);
+}
+
+/*
+ * Атрибут hidden задає display: none лише зі слабкою специфічністю,
+ * тому будь-яке власне display його перебиває. Для елементів, яким
+ * ми ставимо display самі, правило треба повторити явно.
+ */
+.lobby[hidden],
+.stage[hidden] {
+  display: none;
+}

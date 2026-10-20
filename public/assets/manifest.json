@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "images": [
+    {
+      "id": "ships",
+      "url": "/assets/ships.png",
+      "frameWidth": 96,
+      "frameHeight": 64,
+      "frames": 4,
+      "originX": 58,
+      "originY": 32
+    },
+    {
+      "id": "asteroids",
+      "url": "/assets/asteroids.png",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frames": 6,
+      "originX": 64,
+      "originY": 64
+    },
+    {
+      "id": "bullets",
+      "url": "/assets/bullets.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 2,
+      "originX": 12,
+      "originY": 12
+    }
+  ],
+  "audio": [
+    {
+      "id": "fire",
+      "url": "/assets/sfx-fire.wav"
+    },
+    {
+      "id": "hit",
+      "url": "/assets/sfx-hit.wav"
+    },
+    {
+      "id": "explode",
+      "url": "/assets/sfx-explode.wav"
+    }
+  ],
+  "data": [
+    {
+      "id": "arena",
+      "url": "/assets/arena.json"
+    }
+  ]
+}

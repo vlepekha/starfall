@@ -1,6 +1,5 @@
 import { WORLD } from "../sim/arena.js";
 import { Explosion } from "../sim/explosion.js";
-import { getAsteroidSprite } from "./asteroid-sprite.js";
 import { createCanvas } from "./canvas.js";
 
 /**
@@ -10,10 +9,12 @@ import { createCanvas } from "./canvas.js";
  * Важливо: рендер нічого не вирішує про симуляцію. Він отримує готовий
  * стан і коефіцієнт інтерполяції, і лише малює.
  */
-/** Корабель у світових одиницях ~25 од. — множник підбирався на око під арену 1600x900. */
-const SHIP_SCALE = 1.5;
+/** Один піксель спрайта = стільки світових одиниць. */
+const SHIP_SPRITE_SCALE = 1.5;
+const BULLET_SPRITE_SCALE = 1;
 
-export function createRenderer(element) {
+export function createRenderer(element, { assets } = {}) {
+  const sheets = assets?.images ?? new Map();
   const surface = createCanvas(element);
   const ctx = surface.ctx;
   let showVelocity = true;
@@ -140,116 +141,69 @@ export function createRenderer(element) {
     return from + delta * alpha;
   }
 
+  /**
+   * Корабель зі спрайтшита. Кадр обирається за станом, а не за часом:
+   * 0 — без тяги, 1-2 — тяга (чергуються), 3 — щойно отримав урон.
+   */
   function drawShip(ship, x, y, time, ghost, angle) {
+    const sheet = sheets.get("ships");
+    if (!sheet) return;
+    const frame = ship.invulnerable ? 3 : ship.thrusting ? 1 + (Math.floor(time / 70) % 2) : 0;
+
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);
-    ctx.scale(SHIP_SCALE, SHIP_SCALE);
-    // Після респауну корабель кілька секунд невразливий — блимає.
     const blink = ship.invulnerable && Math.floor(time / 110) % 2 === 0;
-    ctx.globalAlpha = ghost ? 0.34 : blink ? 0.35 : 1;
-
-    if (ship.thrusting) {
-      const pulse = 0.82 + 0.18 * Math.sin(time * 0.045);
-      const len = 34 * pulse;
-      const flame = ctx.createLinearGradient(-16, 0, -16 - len, 0);
-      flame.addColorStop(0, "rgba(255, 246, 214, 0.95)");
-      flame.addColorStop(0.35, "rgba(255, 168, 66, 0.8)");
-      flame.addColorStop(1, "rgba(255, 90, 40, 0)");
-      ctx.fillStyle = flame;
-      for (const side of [-1, 1]) {
-        ctx.beginPath();
-        ctx.moveTo(-14, side * 3.5);
-        ctx.lineTo(-16 - len, side * 1.5);
-        ctx.lineTo(-14, side * 10);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-
-    ctx.fillStyle = "#16203c";
-    ctx.strokeStyle = "rgba(126, 224, 255, 0.45)";
-    ctx.lineWidth = 1.6;
-    for (const side of [-1, 1]) {
-      ctx.beginPath();
-      ctx.moveTo(2, side * 5);
-      ctx.lineTo(-10, side * 17);
-      ctx.lineTo(-17, side * 15);
-      ctx.lineTo(-12, side * 5);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
-
-    const hull = ctx.createLinearGradient(24, 0, -18, 0);
-    hull.addColorStop(0, "#e8f4ff");
-    hull.addColorStop(0.45, "#8fb0d8");
-    hull.addColorStop(1, "#243352");
-    ctx.beginPath();
-    ctx.moveTo(25, 0);
-    ctx.lineTo(4, -9);
-    ctx.lineTo(-15, -8);
-    ctx.lineTo(-11, 0);
-    ctx.lineTo(-15, 8);
-    ctx.lineTo(4, 9);
-    ctx.closePath();
-    ctx.fillStyle = hull;
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "#9fe6ff";
-    ctx.stroke();
-
-    const glass = ctx.createLinearGradient(12, -4, -2, 4);
-    glass.addColorStop(0, "#bff3ff");
-    glass.addColorStop(1, "#1d6fa8");
-    ctx.beginPath();
-    ctx.moveTo(13, 0);
-    ctx.lineTo(4, -4.5);
-    ctx.lineTo(-3, 0);
-    ctx.lineTo(4, 4.5);
-    ctx.closePath();
-    ctx.fillStyle = glass;
-    ctx.fill();
-
-    ctx.fillStyle = "#ff7a6b";
-    ctx.beginPath();
-    ctx.arc(22, 0, 1.8, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.globalAlpha = ghost ? 0.34 : blink ? 0.45 : 1;
+    drawFrame(sheet, frame, SHIP_SPRITE_SCALE);
     ctx.restore();
   }
 
+  /** Спільна частина: вирізати кадр зі шита й покласти його навколо origin. */
+  function drawFrame(sheet, frame, scale) {
+    const { bitmap, frameWidth, frameHeight, originX, originY } = sheet;
+    ctx.drawImage(
+      bitmap,
+      frame * frameWidth,
+      0,
+      frameWidth,
+      frameHeight,
+      -originX * scale,
+      -originY * scale,
+      frameWidth * scale,
+      frameHeight * scale,
+    );
+  }
+
   function drawBullet(bullet, x, y, _time, ghost, angle) {
+    const sheet = sheets.get("bullets");
+    if (!sheet) return;
     ctx.save();
     ctx.globalAlpha = ghost ? 0.3 : 1;
     ctx.translate(x, y);
-    // Самонавідна куля інша на вигляд — гравець має бачити, що бонус працює.
-    const colour = bullet.homingEnabled ? "#b388ff" : "#9fe6ff";
     ctx.rotate(angle);
-    const trail = ctx.createLinearGradient(2, 0, -16, 0);
-    trail.addColorStop(0, colour);
-    trail.addColorStop(1, "rgba(159, 230, 255, 0)");
-    ctx.fillStyle = trail;
-    ctx.fillRect(-16, -1.6, 18, 3.2);
-    ctx.fillStyle = colour;
-    ctx.beginPath();
-    ctx.arc(2, 0, bullet.radius * 0.9, 0, Math.PI * 2);
-    ctx.fill();
+    // Другий кадр — самонавідна: гравець має бачити, що бонус працює.
+    drawFrame(sheet, bullet.homingEnabled ? 1 : 0, BULLET_SPRITE_SCALE);
     ctx.restore();
   }
 
   /**
-   * Астероїд: готовий спрайт із asteroid-sprite.js, повернутий на свій кут.
-   * Увесь рельєф намальований один раз при появі каменя — кадр лише
-   * виводить картинку, тому деталізація не коштує часу кадру.
+   * Астероїд зі спрайтшита. Варіант обирається за id, тому камінь
+   * виглядає однаково від появи до розпаду, а шість варіантів не дають
+   * відчуття штампування.
    */
   function drawAsteroid(asteroid, x, y, _time, ghost, angle) {
-    const sprite = getAsteroidSprite(asteroid);
+    const sheet = sheets.get("asteroids");
+    if (!sheet) return;
+    const frame = asteroid.hunting ? 4 + (asteroid.id % 2) : asteroid.id % 4;
+    // У спрайті камінь займає 42% кадру — звідси перерахунок у світові одиниці.
+    const scale = asteroid.radius / (sheet.frameWidth * 0.42);
+
     ctx.save();
     ctx.globalAlpha = ghost ? 0.3 : 1;
     ctx.translate(x, y);
 
-    // Тінь під каменем малюється до повороту — вона «лежить» на площині
-    // і не має крутитися разом із самим астероїдом.
+    // Тінь під каменем не обертається разом із ним: вона лежить на площині.
     const shadow = ctx.createRadialGradient(
       asteroid.radius * 0.16,
       asteroid.radius * 0.2,
@@ -272,9 +226,8 @@ export function createRenderer(element) {
       ctx.shadowColor = "rgba(255, 110, 150, 0.45)";
       ctx.shadowBlur = 12;
     }
-
     ctx.rotate(angle);
-    ctx.drawImage(sprite.canvas, -sprite.half, -sprite.half, sprite.half * 2, sprite.half * 2);
+    drawFrame(sheet, frame, scale);
     ctx.restore();
   }
 

@@ -10,11 +10,25 @@ import { Vector2 } from "./vector.js";
 import { World } from "./world.js";
 
 export const SCORE = { asteroid: 10, hunter: 25, pickup: 5 };
+
+/**
+ * Параметри арени. Приходять з assets/arena.json, а в лобі їх ще й
+ * підкручує обраний режим кімнати (classic / dense / sparse).
+ */
+export const DEFAULT_CONFIG = {
+  asteroidLimit: 12,
+  pickupLimit: 2,
+  asteroidInterval: [2.5, 4.5],
+  pickupInterval: [9, 15],
+};
+
+const randomBetween = ([min, max]) => min + Math.random() * (max - min);
 const RESPAWN_DELAY = 2; // секунди, за умовою лаби
 
 /** Вибух: одна сутність із пучком частинок усередині. На рахунок не впливає. */
 function explode(world, pos, options = {}) {
   world.spawn(new Explosion({ pos, ...options }));
+  world.emit("exploded", { pos, big: (options.count ?? 14) >= 20 });
 }
 
 /**
@@ -71,8 +85,9 @@ const randomEdgePosition = () => {
  * Збирає гру: світ, корабель, стартові астероїди, таймери появи.
  * Повертає об'єкт із методом step(dt) — його і викликає ігровий цикл.
  */
-export function createGame({ onEvent } = {}) {
-  const world = new World();
+export function createGame({ onEvent, bus, config = {} } = {}) {
+  const settings = { ...DEFAULT_CONFIG, ...config };
+  const world = new World({ bus });
   const ship = new Ship({ pos: new Vector2(WORLD.width / 2, WORLD.height / 2) });
   world.add(ship);
 
@@ -80,7 +95,7 @@ export function createGame({ onEvent } = {}) {
   let asteroidTimer = 3;
   let pickupTimer = 6;
 
-  for (const event of ["hit", "death", "score", "pickup", "shot"]) {
+  for (const event of ["hit", "death", "score", "pickup", "fired", "exploded"]) {
     world.on(event, (payload) => onEvent?.(event, payload));
   }
 
@@ -133,14 +148,14 @@ export function createGame({ onEvent } = {}) {
       }
 
       asteroidTimer -= dt;
-      if (asteroidTimer <= 0 && countOf(world, "asteroid") < 12) {
-        asteroidTimer = 2.5 + Math.random() * 2;
+      if (asteroidTimer <= 0 && countOf(world, "asteroid") < settings.asteroidLimit) {
+        asteroidTimer = randomBetween(settings.asteroidInterval);
         spawnAsteroid();
       }
 
       pickupTimer -= dt;
-      if (pickupTimer <= 0 && countOf(world, "pickup") < 2) {
-        pickupTimer = 9 + Math.random() * 6;
+      if (pickupTimer <= 0 && countOf(world, "pickup") < settings.pickupLimit) {
+        pickupTimer = randomBetween(settings.pickupInterval);
         spawnPickup();
       }
 
