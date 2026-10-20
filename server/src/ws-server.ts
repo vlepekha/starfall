@@ -203,7 +203,10 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     const now = Date.now();
     const elapsed = (now - state.lastRefill) / 1000;
     state.lastRefill = now;
-    state.tokens = Math.min(config.messagesPerSecond, state.tokens + elapsed * config.messagesPerSecond);
+    state.tokens = Math.min(
+      config.messagesPerSecond,
+      state.tokens + elapsed * config.messagesPerSecond,
+    );
 
     if (state.tokens < 1) {
       socket.close(CLOSE.RATE_LIMIT, "too many messages");

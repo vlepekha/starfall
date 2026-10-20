@@ -7,8 +7,8 @@
  *     з seed від сервера, час приходить кроками.
  */
 
-export type { Rng } from "./rng.ts";
 export { binaryCodec, type Codec, jsonCodec, pickCodec } from "./codec.ts";
+export type { Rng } from "./rng.ts";
 export { createRng } from "./rng.ts";
 export type { ArenaSettings } from "./sim/arena.ts";
 export { WORLD, wrap } from "./sim/arena.ts";

@@ -1,4 +1,3 @@
-import { millis } from "./types.ts";
 import {
   decodeInput,
   decodeSnapshot,
@@ -9,6 +8,7 @@ import {
   type Snapshot,
   type SnapshotPayload,
 } from "./protocol.ts";
+import { millis } from "./types.ts";
 
 /**
  * Кодек як інтерфейс, а не як набір вільних функцій.
@@ -48,7 +48,11 @@ export const jsonCodec: Codec<string> = {
     if (typeof frame !== "string") return null;
     const parsed: Partial<InputFrame> & { type?: string } = JSON.parse(frame);
     if (parsed.type !== "input" || !parsed.input || parsed.seq === undefined) return null;
-    return { seq: parsed.seq, clientTimeMs: parsed.clientTimeMs ?? millisZero, input: parsed.input };
+    return {
+      seq: parsed.seq,
+      clientTimeMs: parsed.clientTimeMs ?? millisZero,
+      input: parsed.input,
+    };
   },
   encodeSnapshot: jsonSnapshotCodec.encodeSnapshot,
   decodeSnapshot: (frame) => {
