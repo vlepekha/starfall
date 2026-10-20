@@ -8,9 +8,13 @@
     "build": "vite build",
     "preview": "vite preview",
     "assets": "node tools/make-assets.mjs",
-    "bench:physics": "node tools/determinism.js"
+    "bench:physics": "node tools/determinism.js",
+    "make:gif": "node tools/make-gif.mjs"
   },
   "devDependencies": {
     "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@starfall/shared": "*"
   }
 }

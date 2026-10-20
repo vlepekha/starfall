@@ -22,12 +22,12 @@ export const DEFAULT_CONFIG = {
   pickupInterval: [9, 15],
 };
 
-const randomBetween = ([min, max]) => min + Math.random() * (max - min);
+const randomBetween = (rng, [min, max]) => min + rng.next() * (max - min);
 const RESPAWN_DELAY = 2; // секунди, за умовою лаби
 
 /** Вибух: одна сутність із пучком частинок усередині. На рахунок не впливає. */
 function explode(world, pos, options = {}) {
-  world.spawn(new Explosion({ pos, ...options }));
+  world.spawn(new Explosion({ pos, rng: world.rng, ...options }));
   world.emit("exploded", { pos, big: (options.count ?? 14) >= 20 });
 }
 
@@ -73,11 +73,11 @@ function registerCollisionRules() {
 
 registerCollisionRules();
 
-const randomEdgePosition = () => {
-  const onVertical = Math.random() < 0.5;
+const randomEdgePosition = (rng) => {
+  const onVertical = rng.chance(0.5);
   return new Vector2(
-    onVertical ? Math.random() * WORLD.width : Math.random() < 0.5 ? 0 : WORLD.width,
-    onVertical ? (Math.random() < 0.5 ? 0 : WORLD.height) : Math.random() * WORLD.height,
+    onVertical ? rng.next() * WORLD.width : rng.chance(0.5) ? 0 : WORLD.width,
+    onVertical ? (rng.chance(0.5) ? 0 : WORLD.height) : rng.next() * WORLD.height,
   );
 };
 
@@ -85,9 +85,9 @@ const randomEdgePosition = () => {
  * Збирає гру: світ, корабель, стартові астероїди, таймери появи.
  * Повертає об'єкт із методом step(dt) — його і викликає ігровий цикл.
  */
-export function createGame({ onEvent, bus, config = {} } = {}) {
+export function createGame({ onEvent, bus, config = {}, seed = 1 } = {}) {
   const settings = { ...DEFAULT_CONFIG, ...config };
-  const world = new World({ bus });
+  const world = new World({ bus, seed });
   const ship = new Ship({ pos: new Vector2(WORLD.width / 2, WORLD.height / 2) });
   world.add(ship);
 
@@ -106,22 +106,22 @@ export function createGame({ onEvent, bus, config = {} } = {}) {
   });
 
   function spawnAsteroid() {
-    const pos = randomEdgePosition();
+    const pos = randomEdgePosition(world.rng);
     const toCentre = pos
       .shortestDeltaTo(new Vector2(WORLD.width / 2, WORLD.height / 2))
       .normalize();
-    const speed = 40 + Math.random() * 70;
-    const hunter = Math.random() < 0.3;
+    const speed = 40 + world.rng.next() * 70;
+    const hunter = world.rng.chance(0.3);
     const options = { pos, vel: toCentre.scale(speed) };
     world.spawn(hunter ? Asteroid.hunter(options) : new Asteroid(options));
   }
 
   function spawnPickup() {
     const pos = new Vector2(
-      120 + Math.random() * (WORLD.width - 240),
-      120 + Math.random() * (WORLD.height - 240),
+      120 + world.rng.next() * (WORLD.width - 240),
+      120 + world.rng.next() * (WORLD.height - 240),
     );
-    world.spawn(Math.random() < 0.5 ? Pickup.repair(pos) : Pickup.homingAmmo(pos));
+    world.spawn(world.rng.chance(0.5) ? Pickup.repair(pos) : Pickup.homingAmmo(pos));
   }
 
   for (let i = 0; i < 4; i += 1) spawnAsteroid();
@@ -149,13 +149,13 @@ export function createGame({ onEvent, bus, config = {} } = {}) {
 
       asteroidTimer -= dt;
       if (asteroidTimer <= 0 && countOf(world, "asteroid") < settings.asteroidLimit) {
-        asteroidTimer = randomBetween(settings.asteroidInterval);
+        asteroidTimer = randomBetween(world.rng, settings.asteroidInterval);
         spawnAsteroid();
       }
 
       pickupTimer -= dt;
       if (pickupTimer <= 0 && countOf(world, "pickup") < settings.pickupLimit) {
-        pickupTimer = randomBetween(settings.pickupInterval);
+        pickupTimer = randomBetween(world.rng, settings.pickupInterval);
         spawnPickup();
       }
 

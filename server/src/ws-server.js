@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { decodeInput } from "@starfall/shared/protocol";
 import { WebSocketServer } from "ws";
+import { Match } from "./match.js";
 import { createMatchLog } from "./match-log.js";
 import { CLOSE, encode, parseMessage } from "./protocol.js";
 
@@ -14,6 +16,8 @@ import { CLOSE, encode, parseMessage } from "./protocol.js";
 export function attachWebSocket(httpServer, { config, rooms, logEvent }) {
   const wss = new WebSocketServer({ server: httpServer, path: "/ws" });
   const sockets = new Map();
+  /** Один матч на кімнату. Створюється на першому гравцеві. */
+  const matches = new Map();
 
   function send(socket, type, payload) {
     if (socket.readyState !== socket.OPEN) return false;
@@ -75,7 +79,13 @@ export function attachWebSocket(httpServer, { config, rooms, logEvent }) {
       windowStart: Date.now(),
       windowCount: 0,
       ip: request.socket.remoteAddress,
+      bytesIn: 0,
+      bytesOut: 0,
+      json: new URL(request.url, "http://localhost").searchParams.get("proto") === "json",
+      player: null,
+      match: null,
     };
+    state.socket = socket;
     sockets.set(socket, state);
 
     /**
@@ -95,7 +105,17 @@ export function attachWebSocket(httpServer, { config, rooms, logEvent }) {
       },
     });
 
-    socket.on("message", (raw) => handleMessage(socket, state, raw));
+    socket.on("message", (raw, isBinary) => {
+      // Бінарний кадр — це завжди input. Він іде найкоротшим шляхом:
+      // ніякого JSON.parse 30 разів на секунду на кожного гравця.
+      if (isBinary) {
+        state.bytesIn += raw.length;
+        handleInput(state, raw);
+        return;
+      }
+      state.bytesIn += raw.length;
+      handleMessage(socket, state, raw);
+    });
     socket.on("pong", () => {
       state.missedPongs = 0;
     });
@@ -144,9 +164,20 @@ export function attachWebSocket(httpServer, { config, rooms, logEvent }) {
 
       state.roomId = room.id;
       state.name = message.name;
+
+      const match = ensureMatch(room.id);
+      state.match = match;
+      state.player = match.addPlayer(state.id, message.name);
+      state.player.socket = socket;
+
       send(socket, "joined", {
         room: room.toJSON(),
-        you: { id: state.id, name: state.name },
+        you: { id: state.id, name: state.name, shipId: state.player.ship.id },
+        net: {
+          tickHz: match.tickHz ?? 30,
+          seed: match.seed,
+          proto: state.json ? "json" : "binary",
+        },
       });
       logEvent?.({ event: "ws-join", room: room.id, name: state.name });
       return;
@@ -174,8 +205,52 @@ export function attachWebSocket(httpServer, { config, rooms, logEvent }) {
     }
   }
 
+  function ensureMatch(roomId) {
+    const existing = matches.get(roomId);
+    if (existing) return existing;
+
+    const match = new Match({
+      roomId,
+      onSnapshot: (player, payload) => {
+        const socket = player.socket;
+        if (!socket || socket.readyState !== socket.OPEN) return;
+        const state = sockets.get(socket);
+        // Той самий backpressure, що й у лабі 4: знімок — річ
+        // необов'язкова, наступний прийде за 33 мс.
+        if (socket.bufferedAmount > config.maxBufferedBytes) {
+          if (state) state.dropped += 1;
+          return;
+        }
+        const frame = match.encodeFor(player, payload, { json: state?.json });
+        socket.send(frame, { binary: typeof frame !== "string" });
+        if (state)
+          state.bytesOut += typeof frame === "string" ? Buffer.byteLength(frame) : frame.byteLength;
+      },
+    });
+    matches.set(roomId, match);
+    return match;
+  }
+
+  /** Бінарний input: розбір, перевірка версії, у чергу матчу. */
+  function handleInput(state, raw) {
+    if (!state.player || !state.match) return;
+    const decoded = decodeInput(raw);
+    if (!decoded) {
+      state.socket?.close(CLOSE.BAD_SHAPE, "bad input frame");
+      return;
+    }
+    state.match.applyInput(state.id, decoded);
+  }
+
   function cleanup(socket, state, code) {
     clearTimeout(state.joinTimer);
+    if (state.match) {
+      state.match.removePlayer(state.id);
+      if (state.match.playerCount === 0) {
+        state.match.stop();
+        matches.delete(state.roomId);
+      }
+    }
     sockets.delete(socket);
     if (state.roomId) rooms.get(state.roomId)?.remove(state.id);
     logEvent?.({ event: "ws-close", id: state.id, code, dropped: state.dropped });
@@ -203,8 +278,17 @@ export function attachWebSocket(httpServer, { config, rooms, logEvent }) {
     get connections() {
       return sockets.size;
     },
+    get matches() {
+      return [...matches.values()].map((m) => ({
+        room: m.roomId,
+        tick: m.tick,
+        players: m.playerCount,
+        lastTickMs: m.lastTickMs ?? 0,
+      }));
+    },
     async close() {
       clearInterval(pingTimer);
+      for (const match of matches.values()) match.stop();
       for (const socket of sockets.keys()) {
         socket.close(CLOSE.SERVER_SHUTDOWN, "server shutdown");
       }

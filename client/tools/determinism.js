@@ -3,8 +3,7 @@
  * Той самий модуль physics.js, той самий вхід — різні схеми кроку.
  * Запуск: npm run bench:physics
  */
-import { WORLD } from "../src/sim/arena.js";
-import { createShip, integrate } from "../src/sim/ship.js";
+import { createShip, integrate, WORLD } from "@starfall/shared";
 
 const HOLD = { left: false, right: true, thrust: true, brake: false, fire: false };
 const DURATION = 10; // секунд модельного часу

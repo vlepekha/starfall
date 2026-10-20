@@ -555,3 +555,104 @@ kbd {
     max-height: 280px;
   }
 }
+
+/* ---------- Лаба 5: netgraph і керування мережею ---------- */
+
+.netbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.netbar[hidden] {
+  display: none;
+}
+
+.netbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.netbar input[type="range"] {
+  width: 110px;
+  accent-color: var(--accent);
+}
+
+.netbar output {
+  min-width: 48px;
+  font: 11px ui-monospace, Menlo, monospace;
+  color: var(--accent);
+}
+
+.netbar__check input {
+  width: auto;
+  accent-color: var(--warn);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.netgraph {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.netgraph[hidden] {
+  display: none;
+}
+
+.netgraph__title {
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.netgraph__title span {
+  color: var(--muted);
+}
+
+.netgraph__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.netgraph__label {
+  color: var(--muted);
+}
+
+.netgraph__value {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.netgraph__value.is-warn {
+  color: var(--warn);
+}
+
+.netgraph__spark {
+  width: 100%;
+  height: 40px;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+}

@@ -24,6 +24,7 @@ const httpServer = createHttpServer({
   rooms,
   startedAt,
   getConnections: () => ws.connections,
+  getMatches: () => ws.matches,
 });
 
 const ws = attachWebSocket(httpServer, {

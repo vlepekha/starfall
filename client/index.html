@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Starfall — Lab 04: Node.js, WebSocket, streams</title>
+    <title>Starfall — Lab 05: сервер рахує гру</title>
   </head>
   <body>
     <header class="bar">
-      <h1 class="brand"><strong>Starfall</strong> <span class="tag">lab-04</span></h1>
+      <h1 class="brand"><strong>Starfall</strong> <span class="tag">lab-05</span></h1>
       <div class="controls">
         <label>Режим <select id="mode"></select></label>
         <label>Блокування, мс <input id="block-ms" type="number" value="20" min="0" max="500" step="5" /></label>
@@ -25,9 +25,21 @@
         <h2 class="lobby__title">Лобі</h2>
       </section>
 
+      <section id="net-controls" class="netbar" hidden>
+        <label>Затримка <input id="net-latency" type="range" min="0" max="300" step="10" value="0" /><output id="net-latency-out">0 мс</output></label>
+        <label>Розкид <input id="net-jitter" type="range" min="0" max="100" step="5" value="0" /><output id="net-jitter-out">0 мс</output></label>
+        <label>Втрати <input id="net-loss" type="range" min="0" max="30" step="1" value="0" /><output id="net-loss-out">0 %</output></label>
+        <label class="netbar__check"><input id="net-predict" type="checkbox" checked /> передбачення</label>
+        <label class="netbar__check"><input id="net-desync" type="checkbox" /> Math.random() у кроці</label>
+        <button id="net-cheat" type="button">Спроба чіту</button>
+      </section>
+
       <div class="play">
         <div class="stage"><canvas id="arena"></canvas></div>
-        <section id="chat" class="chat" hidden></section>
+        <aside class="side">
+          <section id="netgraph" class="netgraph" hidden></section>
+          <section id="chat" class="chat" hidden></section>
+        </aside>
       </div>
       <button id="retry" class="retry" type="button" hidden>Retry завантаження</button>
       <div id="hud" class="hud"></div>

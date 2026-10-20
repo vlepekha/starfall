@@ -1,3 +1,4 @@
+import { createRng } from "../rng.js";
 import { resolveCollisions } from "./collision.js";
 
 /**
@@ -20,8 +21,15 @@ export class World {
    * (звук, HUD, статистика) — його не стосується. Саме тому в sim/
    * немає жодного імпорту з audio/ чи render/.
    */
-  constructor({ bus } = {}) {
+  constructor({ bus, seed = 1 } = {}) {
     this.#bus = bus ?? null;
+
+    /**
+     * Генератор світу. Він НЕ глобальний: кожен світ має власний,
+     * із seed від сервера. Саме тому клієнт, перегравши ті самі
+     * кроки, отримує ті самі уламки й ті самі точки появи астероїдів.
+     */
+    this.rng = createRng(seed);
   }
 
   /** Лічильники для HUD: за крок їх оновлює step(). */

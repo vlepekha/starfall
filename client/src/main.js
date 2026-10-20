@@ -1,4 +1,5 @@
 import "./style.css";
+import { createGame } from "@starfall/shared";
 import { activeFailure, FAILURES } from "./assets/failures.js";
 import { loadAll } from "./assets/load-all.js";
 import { loadJson } from "./assets/loaders.js";
@@ -12,12 +13,14 @@ import { Lobby } from "./lobby/lobby.js";
 import { createLobbyView } from "./lobby/lobby-dom.js";
 import { createLoop } from "./loop.js";
 import { createIntervalLoop, createVariableLoop } from "./loop-variants.js";
+import { createLink } from "./net/link.js";
+import { createNetcode } from "./net/netcode.js";
 import { GameSocket } from "./net/socket.js";
 import { runPuzzles } from "./puzzles.js";
 import { createRenderer } from "./render/draw.js";
 import { createHud } from "./render/hud.js";
 import { createLoadingScreen } from "./render/loading.js";
-import { createGame } from "./sim/rules.js";
+import { createNetgraph } from "./render/netgraph.js";
 import { demonstrateThisBug } from "./this-demo.js";
 
 const canvas = document.querySelector("#arena");
@@ -31,6 +34,8 @@ const chatRoot = document.querySelector("#chat");
 const retryButton = document.querySelector("#retry");
 const soundButton = document.querySelector("#sound");
 const stageEl = document.querySelector(".stage");
+const netgraphRoot = document.querySelector("#netgraph");
+const netControls = document.querySelector("#net-controls");
 
 const bus = new GameBus();
 const socket = new GameSocket();
@@ -43,8 +48,31 @@ const chat = createChatView(chatRoot, socket);
  */
 let session = null;
 
+/* ------------------------------------------------------------------ */
+/*  Мережа: канал з умовами, netcode, netgraph                          */
+/* ------------------------------------------------------------------ */
+
+const link = createLink({
+  send: (frame) => socket.sendRaw(frame),
+  onMessage: ({ data, isBinary }) => netcode.onFrame(data, { isBinary }),
+});
+
+const netcode = createNetcode({ link, getInput: () => input.snapshot() });
+const netgraph = createNetgraph(netgraphRoot);
+
+// Сирі кадри (бінарні знімки) не проходять через JSON-розбір у GameSocket —
+// вони одразу йдуть у канал із затримкою, а звідти в netcode.
+socket.addEventListener("raw", (event) => link.receive(event.detail));
+
 socket.addEventListener("state", (event) => {
   if (event.detail.state === "open" && session) socket.send("join", session);
+});
+
+// Сервер надіслав підтвердження входу — звідси беремо seed і id корабля.
+socket.addEventListener("joined", (event) => {
+  const { you, net } = event.detail;
+  netcode.reset(net?.seed ?? 1, you.shipId);
+  netcode.stats.proto = net?.proto ?? "binary";
 });
 const input = createInput();
 const audio = createAudio({ bus });
@@ -172,8 +200,11 @@ async function startGame({ name, room }) {
   soundButton.textContent = audio.muted ? "Sound off" : "Sound on";
 
   const config = { ...assets.data.get("arena"), ...(ARENA_PRESETS[room?.arena] ?? {}) };
+  // Локальний game лишається лише як джерело HUD-статистики: саму гру
+  // тепер рахує сервер.
   game = createGame({ bus, config, onEvent: logEvent });
-  game.ship.controller = () => input.snapshot();
+  netControls.hidden = false;
+  netgraphRoot.hidden = false;
 
   renderer = createRenderer(canvas, { assets });
   hud = createHud(hudRoot);
@@ -188,14 +219,19 @@ function update(dt) {
     const on = renderer.toggleVelocity();
     logEvent("debug", { text: `вектор швидкості ${on ? "увімкнено" : "вимкнено"}` });
   }
-  game.step(dt);
+
+  // Світ рахує сервер. Локально ми лише передбачаємо свій корабель
+  // і свої кулі — решта приходить знімками.
+  netcode.update(dt);
   input.endStep();
 }
 
 function render(alpha) {
   if (mode === "block") burnMilliseconds(Number(blockInput.value) || 0);
-  renderer.render(game.world, mode === "variable" ? 1 : alpha);
+  const view = netcode.buildView();
+  renderer.render(view, mode === "variable" ? 1 : alpha);
   hud.update(loop.stats, game, EXPERIMENTS[mode].label, performance.now());
+  netgraph.update(netcode.stats, performance.now());
 }
 
 function buildLoop() {
@@ -290,6 +326,52 @@ if (new URLSearchParams(window.location.search).has("bench")) {
 
 document.querySelector("#reset").addEventListener("click", () => game?.reset());
 
+/* ------------------------------------------------------------------ */
+/*  Керування умовами мережі                                            */
+/* ------------------------------------------------------------------ */
+
+const sliders = [
+  ["#net-latency", "#net-latency-out", "latencyMs", (v) => `${v} мс`],
+  ["#net-jitter", "#net-jitter-out", "jitterMs", (v) => `${v} мс`],
+  ["#net-loss", "#net-loss-out", "lossPercent", (v) => `${v} %`],
+];
+
+for (const [inputSelector, outputSelector, key, format] of sliders) {
+  const el = document.querySelector(inputSelector);
+  const out = document.querySelector(outputSelector);
+  const apply = () => {
+    link.settings[key] = Number(el.value);
+    out.textContent = format(el.value);
+  };
+  el.addEventListener("input", apply);
+  apply();
+}
+
+document.querySelector("#net-predict").addEventListener("change", (event) => {
+  netcode.options.predict = event.target.checked;
+  logEvent("net", {
+    text: event.target.checked
+      ? "передбачення увімкнено — корабель рухається одразу"
+      : "передбачення вимкнено — корабель рухається лише після знімка",
+  });
+});
+
+document.querySelector("#net-desync").addEventListener("change", (event) => {
+  netcode.options.desync = event.target.checked;
+  logEvent("net", {
+    text: event.target.checked
+      ? "у крок додано Math.random() — дивіться, як росте поправка"
+      : "випадковість прибрано, поправка має впасти",
+  });
+});
+
+document.querySelector("#net-cheat").addEventListener("click", () => {
+  const decoded = netcode.tryCheat();
+  logEvent("net", {
+    text: `надіслано input seq=${decoded.seq} — сервер приймає лише наміри, координат у протоколі немає`,
+  });
+});
+
 // Вихід із кімнати: закриваємо сокет і повертаємось у лобі.
 document.querySelector("#leave").addEventListener("click", () => {
   session = null;
@@ -315,6 +397,7 @@ function logEvent(type, payload = {}) {
       "this-error": () => `this зламався — ${payload.text}`,
       "load-error": () => `завантаження: ${payload.text}`,
       "load-retry": () => `повтор ${payload.text}`,
+      net: () => payload.text,
       fired: () => null,
       exploded: () => null,
     }[type]?.() ?? null;
@@ -361,11 +444,22 @@ window.starfall = {
   bus,
   audio,
   lobby,
+  netcode,
+  link,
   get game() {
     return game;
   },
   setMode(next) {
     modeSelect.value = next;
     applyMode(next);
+  },
+  /**
+   * Намалювати один кадр уручну. Потрібно для запису GIF: у фоновій
+   * вкладці браузер тротлить requestAnimationFrame, і цикл стоїть.
+   */
+  renderFrame() {
+    if (!renderer || !game) return false;
+    render(1);
+    return true;
   },
 };

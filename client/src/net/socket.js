@@ -19,6 +19,7 @@ export class GameSocket extends EventTarget {
   constructor({ url, maxQueue = 64, maxDelay = 10_000 } = {}) {
     super();
     this.url = url ?? defaultUrl();
+    this.binaryType = "arraybuffer";
     this.maxQueue = maxQueue;
     this.maxDelay = maxDelay;
     this.state = "idle";
@@ -42,6 +43,7 @@ export class GameSocket extends EventTarget {
       attempt: this.#attempt,
     });
     const socket = new WebSocket(this.url);
+    socket.binaryType = this.binaryType;
     this.#socket = socket;
 
     socket.addEventListener("open", () => {
@@ -56,6 +58,13 @@ export class GameSocket extends EventTarget {
     });
 
     socket.addEventListener("message", (event) => {
+      // Бінарний кадр — це знімок стану. Він не JSON і не повинен
+      // проходити через розбір: його чекає netcode через канал затримки.
+      if (typeof event.data !== "string") {
+        this.#emit("raw", { data: event.data, isBinary: true });
+        return;
+      }
+
       let payload;
       try {
         payload = JSON.parse(event.data);
@@ -111,6 +120,15 @@ export class GameSocket extends EventTarget {
     this.#queue.push(message);
     this.#emit("queued", { size: this.#queue.length });
     return false;
+  }
+
+  /** Надіслати готовий кадр (ArrayBuffer) без обгортання в JSON. */
+  sendRaw(frame) {
+    if (this.#socket?.readyState === WebSocket.OPEN) {
+      this.#socket.send(frame);
+      return true;
+    }
+    return false; // input застарів би в черзі — краще просто втратити
   }
 
   close(code = 1000, reason = "bye") {

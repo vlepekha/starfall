@@ -7,10 +7,12 @@
       "client/*.js",
       "server/src/**/*.js",
       "server/tools/**/*.mjs",
+      "shared/src/**/*.js",
       "*.js",
       "*.json",
       "client/*.json",
-      "server/*.json"
+      "server/*.json",
+      "shared/*.json"
     ]
   },
   "formatter": {

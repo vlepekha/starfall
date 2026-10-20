@@ -1,4 +1,4 @@
-import { WORLD } from "../sim/arena.js";
+import { WORLD } from "@starfall/shared";
 import { createCanvas } from "./canvas.js";
 
 /**

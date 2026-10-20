@@ -11,9 +11,11 @@
     "bench:blocking": "node tools/blocking-bench.mjs",
     "check:proto": "node tools/proto-check.mjs",
     "demo:error": "node tools/error-demo.mjs",
-    "check:paths": "node tools/path-check.mjs"
+    "check:paths": "node tools/path-check.mjs",
+    "check:net": "node tools/net-check.mjs"
   },
   "dependencies": {
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "@starfall/shared": "*"
   }
 }

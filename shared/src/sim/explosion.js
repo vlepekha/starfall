@@ -11,21 +11,34 @@ import { Vector2 } from "./vector.js";
  * участі не бере, а частинки живуть усередині звичайним масивом.
  */
 export class Explosion extends Entity {
-  constructor({ count = 14, color = "#ffb648", speed = 240, lifetime = 0.7, ...options } = {}) {
+  /**
+   * @param {object} options
+   * @param {{next: () => number}} options.rng — обов'язковий: без нього
+   *   частинки розлетілися б по-різному на сервері й на клієнті.
+   */
+  constructor({
+    count = 14,
+    color = "#ffb648",
+    speed = 240,
+    lifetime = 0.7,
+    rng,
+    ...options
+  } = {}) {
     super({ kind: "explosion", radius: 0, ...options });
+    const random = rng?.next ?? (() => 0.5);
     this.color = color;
     this.lifetime = lifetime;
     this.age = 0;
 
     this.particles = Array.from({ length: count }, (_, i) => {
-      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
-      const v = Vector2.fromAngle(angle, speed * (0.4 + Math.random() * 0.8));
+      const angle = (Math.PI * 2 * i) / count + random() * 0.4;
+      const v = Vector2.fromAngle(angle, speed * (0.4 + random() * 0.8));
       return {
         x: this.pos.x,
         y: this.pos.y,
         vx: v.x,
         vy: v.y,
-        life: 0.35 + Math.random() * (lifetime - 0.3),
+        life: 0.35 + random() * (lifetime - 0.3),
         age: 0,
       };
     });

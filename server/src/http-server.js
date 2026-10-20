@@ -85,7 +85,7 @@ async function readBody(req, limit = 8192) {
   return Buffer.concat(chunks).toString("utf8");
 }
 
-export function createHttpServer({ config, rooms, startedAt, getConnections }) {
+export function createHttpServer({ config, rooms, startedAt, getConnections, getMatches }) {
   const server = createServer(async (req, res) => {
     /**
      * Перевіряємо СИРИЙ рядок запиту до того, як його торкнеться URL.
@@ -109,6 +109,7 @@ export function createHttpServer({ config, rooms, startedAt, getConnections }) {
           uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
           rooms: rooms.size,
           connections: getConnections(),
+          matches: getMatches?.() ?? [],
           rss: process.memoryUsage().rss,
           pid: process.pid,
         });
