@@ -3,17 +3,24 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "npm run dev --workspace client",
+    "dev:server": "npm run dev --workspace server",
+    "dev:all": "npm run dev:server & npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "start": "npm run build && npm run start --workspace server",
+    "assets": "npm run assets --workspace client",
+    "bench:physics": "npm run bench:physics --workspace client",
+    "bench:rss": "npm run bench:rss --workspace server",
+    "bench:blocking": "npm run bench:blocking --workspace server",
     "lint": "biome check .",
-    "format": "biome format --write .",
-    "bench:physics": "node tools/determinism.js",
-    "assets": "node tools/make-assets.mjs"
+    "format": "biome format --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.13",
-    "vite": "^8.3.0"
+    "@biomejs/biome": "^2.5.13"
   }
 }

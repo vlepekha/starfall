@@ -111,7 +111,10 @@ export function distanceToPolygon(points, x, y) {
     const dx = xj - xi;
     const dy = yj - yi;
     const lengthSquared = dx * dx + dy * dy;
-    const t = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1, ((x - xi) * dx + (y - yi) * dy) / lengthSquared));
+    const t =
+      lengthSquared === 0
+        ? 0
+        : Math.max(0, Math.min(1, ((x - xi) * dx + (y - yi) * dy) / lengthSquared));
     best = Math.min(best, Math.hypot(x - (xi + dx * t), y - (yi + dy * t)));
   }
   return best;

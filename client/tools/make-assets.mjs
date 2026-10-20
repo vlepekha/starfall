@@ -90,7 +90,8 @@ function drawShipFrame(width, height, { flame = 0, hit = false }) {
 
     if (insidePolygon(HULL, x, y)) {
       const t = Math.min(1, Math.max(0, (25 - x) / 43));
-      const base = t < 0.45 ? mix(hullHigh, hullMid, t / 0.45) : mix(hullMid, hullLow, (t - 0.45) / 0.55);
+      const base =
+        t < 0.45 ? mix(hullHigh, hullMid, t / 0.45) : mix(hullMid, hullLow, (t - 0.45) / 0.55);
       // Світло згори-зліва: верхня половина трохи яскравіша.
       const lit = 1 + (-y / 12) * 0.28;
       const colour = base.map((c) => Math.min(1, c * lit));
@@ -197,7 +198,7 @@ function drawAsteroidFrame(size, seed, hunting) {
     const rim = 1 - dist / edge;
     if (rim < 0.08 && t > 0.5) colour = mix(colour, surface, (0.08 - rim) * 9 * facing);
 
-    if (hunting) colour = mix(colour, hex("#ff8fb0"), Math.max(0, 0.22 - dist / edge * 0.22));
+    if (hunting) colour = mix(colour, hex("#ff8fb0"), Math.max(0, 0.22 - (dist / edge) * 0.22));
 
     return [...colour, 1];
   });
@@ -269,13 +270,17 @@ const sounds = {
 
 function sheetWide(frames, frameWidth, frameHeight) {
   const out = new Raster(frameWidth * frames.length, frameHeight);
-  frames.forEach((frame, i) => out.blit(frame, i * frameWidth, 0));
+  frames.forEach((frame, i) => {
+    out.blit(frame, i * frameWidth, 0);
+  });
   return out;
 }
 
 function sheet(frames, frameSize) {
   const out = new Raster(frameSize * frames.length, frameSize);
-  frames.forEach((frame, i) => out.blit(frame, i * frameSize, 0));
+  frames.forEach((frame, i) => {
+    out.blit(frame, i * frameSize, 0);
+  });
   return out;
 }
 

@@ -7,10 +7,12 @@ import { runBenchmark } from "./bench.js";
 import { GameBus } from "./bus.js";
 import { burnMilliseconds, EXPERIMENTS } from "./experiments.js";
 import { createInput } from "./input.js";
+import { createChatView } from "./lobby/chat.js";
 import { Lobby } from "./lobby/lobby.js";
 import { createLobbyView } from "./lobby/lobby-dom.js";
 import { createLoop } from "./loop.js";
 import { createIntervalLoop, createVariableLoop } from "./loop-variants.js";
+import { GameSocket } from "./net/socket.js";
 import { runPuzzles } from "./puzzles.js";
 import { createRenderer } from "./render/draw.js";
 import { createHud } from "./render/hud.js";
@@ -25,11 +27,25 @@ const blockInput = document.querySelector("#block-ms");
 const noteEl = document.querySelector("#note");
 const logEl = document.querySelector("#log");
 const lobbyRoot = document.querySelector("#lobby");
+const chatRoot = document.querySelector("#chat");
 const retryButton = document.querySelector("#retry");
 const soundButton = document.querySelector("#sound");
 const stageEl = document.querySelector(".stage");
 
 const bus = new GameBus();
+const socket = new GameSocket();
+const chat = createChatView(chatRoot, socket);
+
+/**
+ * Поточна сесія гравця. Потрібна саме для перепідключення: сокет може
+ * відкритися заново будь-коли, і щоразу треба відрекомендуватися знову —
+ * сервер після розриву про нас нічого не пам'ятає.
+ */
+let session = null;
+
+socket.addEventListener("state", (event) => {
+  if (event.detail.state === "open" && session) socket.send("join", session);
+});
 const input = createInput();
 const audio = createAudio({ bus });
 const loading = createLoadingScreen(canvas);
@@ -139,6 +155,15 @@ const ARENA_PRESETS = {
 async function startGame({ name, room }) {
   lobbyView.hide();
   stageEl.hidden = false;
+  chat.show();
+
+  // Мережа. join НЕ надсилається тут напряму: ним займається обробник
+  // відкриття нижче. Інакше після перепідключення сокет був би відкритий,
+  // але сервер не знав би, хто ми, і через 5 с закрив би з'єднання
+  // з кодом 4004 (join timeout) — рівно це й сталося при першій перевірці.
+  session = { room: room?.id ?? "local", name };
+  socket.connect();
+  if (socket.state === "open") socket.send("join", session);
 
   // Клік по Join — це жест користувача, єдиний момент, коли браузер
   // дозволить запустити AudioContext. Пізніше такої нагоди не буде.
@@ -264,6 +289,16 @@ if (new URLSearchParams(window.location.search).has("bench")) {
 }
 
 document.querySelector("#reset").addEventListener("click", () => game?.reset());
+
+// Вихід із кімнати: закриваємо сокет і повертаємось у лобі.
+document.querySelector("#leave").addEventListener("click", () => {
+  session = null;
+  socket.close(1000, "leave");
+  chat.hide();
+  loop?.stop();
+  stageEl.hidden = true;
+  showLobby();
+});
 
 /** Стрічка подій під ареною. */
 function logEvent(type, payload = {}) {

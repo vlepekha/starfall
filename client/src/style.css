@@ -439,3 +439,119 @@ kbd {
 .stage[hidden] {
   display: none;
 }
+
+/* ---------- Лаба 4: чат кімнати ---------- */
+
+.play {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 14px;
+  align-items: start;
+}
+
+.chat {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 66vh;
+  overflow: hidden;
+}
+
+.chat[hidden] {
+  display: none;
+}
+
+.chat__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chat__room {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.chat__state {
+  font: 11px ui-monospace, Menlo, monospace;
+  color: var(--muted);
+}
+
+.chat__state[data-state="open"] {
+  color: #8affc1;
+}
+
+.chat__state[data-state="waiting"],
+.chat__state[data-state="reconnecting"] {
+  color: var(--warn);
+}
+
+.chat__state[data-state="closed"] {
+  color: var(--bad);
+}
+
+.chat__log {
+  flex: 1;
+  margin: 0;
+  padding: 10px 14px;
+  list-style: none;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--muted);
+}
+
+.chat__line--chat {
+  color: var(--ink);
+}
+
+.chat__line--me {
+  color: var(--accent);
+}
+
+.chat__line--join {
+  color: #8affc1;
+}
+
+.chat__line--leave {
+  color: var(--warn);
+}
+
+.chat__line--error {
+  color: var(--bad);
+}
+
+.chat__line--queued {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.chat__form {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--line);
+}
+
+.chat__form input {
+  flex: 1;
+  width: auto;
+}
+
+@media (max-width: 900px) {
+  .play {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chat {
+    max-height: 280px;
+  }
+}

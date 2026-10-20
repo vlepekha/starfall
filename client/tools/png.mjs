@@ -52,10 +52,7 @@ export function encodePng(width, height, rgba) {
   const raw = Buffer.alloc((stride + 1) * height);
   for (let y = 0; y < height; y += 1) {
     raw[y * (stride + 1)] = 0;
-    Buffer.from(rgba.buffer, rgba.byteOffset + y * stride, stride).copy(
-      raw,
-      y * (stride + 1) + 1,
-    );
+    Buffer.from(rgba.buffer, rgba.byteOffset + y * stride, stride).copy(raw, y * (stride + 1) + 1);
   }
 
   return Buffer.concat([

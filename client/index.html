@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Starfall — Lab 03: Async JavaScript</title>
+    <title>Starfall — Lab 04: Node.js, WebSocket, streams</title>
   </head>
   <body>
     <header class="bar">
-      <h1 class="brand"><strong>Starfall</strong> <span class="tag">lab-03</span></h1>
+      <h1 class="brand"><strong>Starfall</strong> <span class="tag">lab-04</span></h1>
       <div class="controls">
         <label>Режим <select id="mode"></select></label>
         <label>Блокування, мс <input id="block-ms" type="number" value="20" min="0" max="500" step="5" /></label>
@@ -16,6 +16,7 @@
         <button id="sound" type="button" hidden>Sound on</button>
         <button id="bench" type="button">Run benchmark</button>
         <button id="reset" type="button">Reset ship</button>
+        <button id="leave" type="button">Leave room</button>
       </div>
     </header>
 
@@ -24,7 +25,10 @@
         <h2 class="lobby__title">Лобі</h2>
       </section>
 
-      <div class="stage"><canvas id="arena"></canvas></div>
+      <div class="play">
+        <div class="stage"><canvas id="arena"></canvas></div>
+        <section id="chat" class="chat" hidden></section>
+      </div>
       <button id="retry" class="retry" type="button" hidden>Retry завантаження</button>
       <div id="hud" class="hud"></div>
       <p id="note" class="note"></p>
