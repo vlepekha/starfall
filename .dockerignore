@@ -1,0 +1,21 @@
+# Усе, що не потрібне в образі. Кожен зайвий файл тут — це довша
+# передача контексту в демон і більший шар у кеші.
+.git
+.github
+node_modules
+**/node_modules
+client/dist
+coverage
+test-results
+playwright-report
+profiles
+docs
+e2e
+**/logs
+*.log
+.env
+.env.*
+.DS_Store
+Dockerfile
+.dockerignore
+README.md

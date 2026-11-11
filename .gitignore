@@ -3,3 +3,9 @@ dist
 .DS_Store
 *.local
 server/logs
+coverage
+test-results
+playwright-report
+profiles
+.env
+.env.*

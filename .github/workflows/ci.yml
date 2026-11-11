@@ -63,3 +63,82 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  # Окрема задача: образ має не просто зібратися, а поводитись як
+  # належить на хостингу. Перевіряємо це тут, бо локально Docker є не
+  # в кожного, а в CI він є завжди.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Зібрати образ
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: starfall:ci
+          build-args: GIT_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Вимога лаби: фінальний образ менший за 200 МБ. Якщо в нього
+      # знову заїдуть dev-залежності, ця перевірка це й покаже.
+      - name: Розмір образу
+        run: |
+          BYTES=$(docker image inspect starfall:ci --format '{{.Size}}')
+          MB=$((BYTES / 1024 / 1024))
+          echo "розмір образу: ${MB} МБ"
+          echo "### Образ: ${MB} МБ" >> "$GITHUB_STEP_SUMMARY"
+          test "$MB" -lt 200
+
+      - name: Процес не від імені root
+        run: |
+          USER_IN_IMAGE=$(docker run --rm starfall:ci id -un)
+          echo "користувач у контейнері: $USER_IN_IMAGE"
+          test "$USER_IN_IMAGE" != "root"
+
+      - name: Немає dev-залежностей
+        run: |
+          # Vite і Vitest у рантаймі означають, що другий npm ci не спрацював.
+          if docker run --rm starfall:ci sh -c 'ls node_modules | grep -E "^(vite|vitest|@biomejs|@playwright)$"'; then
+            echo "у фінальному образі лишилися dev-залежності"
+            exit 1
+          fi
+          echo "dev-залежностей немає"
+
+      - name: /health, /ready і SHA збірки
+        run: |
+          docker run -d --name starfall-ci -p 8080:8080 \
+            -e ALLOWED_ORIGINS=https://example.com \
+            starfall:ci
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8080/health > /tmp/health.json && break
+            sleep 1
+          done
+          cat /tmp/health.json
+          # SHA в /health має збігатися з комітом, який зібрали.
+          test "$(jq -r .sha /tmp/health.json)" = "${{ github.sha }}"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ready)" = "200"
+          curl -sf http://127.0.0.1:8080/metrics | head -5
+
+      # Головна перевірка лаби: docker stop має завершити процес
+      # акуратно й швидше за 10 секунд, з кодом виходу 0.
+      - name: docker stop завершує процес менше ніж за 10 с
+        run: |
+          START=$(date +%s%N)
+          docker stop -t 10 starfall-ci
+          END=$(date +%s%N)
+          MS=$(( (END - START) / 1000000 ))
+          CODE=$(docker inspect starfall-ci --format '{{.State.ExitCode}}')
+          echo "зупинка за ${MS} мс, код виходу ${CODE}"
+          echo "### docker stop: ${MS} мс, код ${CODE}" >> "$GITHUB_STEP_SUMMARY"
+          docker logs starfall-ci | tail -5
+          test "$CODE" -eq 0
+          test "$MS" -lt 10000
+
+      - name: Прибрати
+        if: always()
+        run: docker rm -f starfall-ci || true

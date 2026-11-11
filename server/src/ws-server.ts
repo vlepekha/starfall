@@ -5,17 +5,48 @@ import { CLOSE, parseClientMessage } from "@starfall/shared/messages";
 import { decodeInput } from "@starfall/shared/protocol";
 import { type RawData, type WebSocket, WebSocketServer } from "ws";
 import type { Config } from "./config.ts";
+import type { Logger } from "./log.ts";
+import { silentLogger } from "./log.ts";
 import { Match, type Player, type TickPayload } from "./match.ts";
 import { createMatchLog, type LogEvent } from "./match-log.ts";
 import type { Room, RoomRegistry } from "./room.ts";
 
-/** Скільки кімнат сервер готовий тримати одночасно. */
-const MAX_ROOMS = 32;
+/**
+ * Чи дозволений цей Origin.
+ *
+ * Окрема експортована функція, бо це рівно те місце, яке треба
+ * покрити тестами: помилка тут або відкриває сервер усьому
+ * інтернету, або не пускає власних гравців.
+ *
+ * Правила:
+ *  - порожній список дозволених — перевірки немає (лише в розробці,
+ *    у production конфіг такого не дозволить);
+ *  - відсутній Origin пропускаємо: його не надсилають НЕ-браузерні
+ *    клієнти (боти, навантажувальний тест, curl). Захист потрібен
+ *    саме від чужої сторінки в браузері, а вона Origin надсилає завжди;
+ *  - порівнюємо точний рядок, без «закінчується на»: перевірка
+ *    `endsWith("example.com")` пропустила б evil-example.com.
+ */
+export function isOriginAllowed(origin: string | undefined, allowed: readonly string[]): boolean {
+  if (allowed.length === 0) return true;
+  if (origin === undefined || origin === "") return true;
+  return allowed.includes(origin);
+}
+
+/** IP клієнта з урахуванням проксі: на хостингу ми завжди за ним. */
+export function clientIp(request: IncomingMessage): string {
+  const forwarded = request.headers["x-forwarded-for"];
+  const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  // Перший у списку — початковий клієнт; далі йдуть проксі.
+  const first = raw?.split(",")[0]?.trim();
+  return first || request.socket.remoteAddress || "unknown";
+}
 
 const encode = (type: string, payload: Record<string, unknown> = {}): string =>
   JSON.stringify({ type, ...payload });
 
 interface SocketState {
+  readonly ip: string;
   readonly id: string;
   readonly socket: WebSocket;
   roomId: string | null;
@@ -37,6 +68,19 @@ export interface WsOptions {
   config: Config;
   rooms: RoomRegistry;
   logEvent?: (event: LogEvent) => void;
+  log?: Logger;
+}
+
+/** Лічильники для /metrics. Від старту процесу, не швидкості. */
+export interface WsCounters {
+  messagesIn: number;
+  messagesOut: number;
+  bytesIn: number;
+  bytesOut: number;
+  closedByRateLimit: number;
+  closedByOrigin: number;
+  closedByIpLimit: number;
+  rejectedFrames: number;
 }
 
 export interface MatchInfo {
@@ -51,7 +95,24 @@ export interface MatchInfo {
  * це на події кімнати. Будь-яке порушення протоколу — закриття сокета
  * з конкретним кодом.
  */
-export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }: WsOptions) {
+export function attachWebSocket(
+  httpServer: Server,
+  { config, rooms, logEvent, log = silentLogger }: WsOptions,
+) {
+  const counters: WsCounters = {
+    messagesIn: 0,
+    messagesOut: 0,
+    bytesIn: 0,
+    bytesOut: 0,
+    closedByRateLimit: 0,
+    closedByOrigin: 0,
+    closedByIpLimit: 0,
+    rejectedFrames: 0,
+  };
+
+  /** Скільки з'єднань тримає кожна IP. Ключ зникає разом з останнім. */
+  const perIp = new Map<string, number>();
+  let acceptingConnections = true;
   /**
    * maxPayload — захист на рівні бібліотеки: кадри більші за ліміт
    * ws відкидає сам, не збираючи їх у пам'яті. Наша перевірка в
@@ -61,6 +122,38 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     server: httpServer,
     path: "/ws",
     maxPayload: config.maxMessageBytes,
+    /**
+     * Перевірка ДО рукостискання.
+     *
+     * Принципово відхиляти тут, а не після connection: відмова на
+     * рукостисканні — це звичайний HTTP 403, сокет не створюється
+     * взагалі, і нам не треба тримати стан для з'єднання, яке ми
+     * однаково не обслуговуємо.
+     */
+    verifyClient: ({ origin, req }, done) => {
+      if (!acceptingConnections) {
+        log.info({ event: "handshake-rejected", reason: "shutting-down" });
+        done(false, 503, "server is shutting down");
+        return;
+      }
+
+      if (!isOriginAllowed(origin, config.allowedOrigins)) {
+        counters.closedByOrigin += 1;
+        log.warn({ event: "handshake-rejected", reason: "bad-origin", origin });
+        done(false, 403, "origin not allowed");
+        return;
+      }
+
+      const ip = clientIp(req);
+      if ((perIp.get(ip) ?? 0) >= config.maxConnectionsPerIp) {
+        counters.closedByIpLimit += 1;
+        log.warn({ event: "handshake-rejected", reason: "ip-limit", ip });
+        done(false, 429, "too many connections");
+        return;
+      }
+
+      done(true);
+    },
   });
   const sockets = new Map<WebSocket, SocketState>();
   /** Один матч на кімнату. Створюється на першому гравцеві. */
@@ -77,7 +170,10 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
       return false;
     }
 
-    socket.send(encode(type, payload));
+    const frame = encode(type, payload);
+    socket.send(frame);
+    counters.messagesOut += 1;
+    counters.bytesOut += Buffer.byteLength(frame);
     return true;
   }
 
@@ -126,9 +222,10 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
         }
         const frame = match.encodeFor(player, payload, { json: state?.json ?? false });
         socket.send(frame, { binary: typeof frame !== "string" });
-        if (state) {
-          state.bytesOut += typeof frame === "string" ? Buffer.byteLength(frame) : frame.byteLength;
-        }
+        const size = typeof frame === "string" ? Buffer.byteLength(frame) : frame.byteLength;
+        if (state) state.bytesOut += size;
+        counters.messagesOut += 1;
+        counters.bytesOut += size;
       },
     });
     matches.set(roomId, match);
@@ -142,8 +239,18 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     return new Uint8Array(raw);
   }
 
+  function totalPlayers(): number {
+    let total = 0;
+    for (const match of matches.values()) total += match.playerCount;
+    return total;
+  }
+
   wss.on("connection", (socket: WebSocket, request: IncomingMessage) => {
+    const ip = clientIp(request);
+    perIp.set(ip, (perIp.get(ip) ?? 0) + 1);
+
     const state: SocketState = {
+      ip,
       id: randomUUID(),
       socket,
       roomId: null,
@@ -177,6 +284,8 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     socket.on("message", (raw: RawData, isBinary: boolean) => {
       const bytes = toBytes(raw);
       state.bytesIn += bytes.byteLength;
+      counters.messagesIn += 1;
+      counters.bytesIn += bytes.byteLength;
       if (isBinary) handleInput(state, bytes);
       else handleMessage(socket, state, bytes);
     });
@@ -187,7 +296,7 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     socket.on("close", (code: number) => cleanup(socket, state, code));
     // Без цього слухача помилка сокета стала б необробленою подією "error".
     socket.on("error", (error: Error) => {
-      console.error(`[ws ${state.id}] ${error.message}`);
+      log.error({ event: "ws-error", player: state.id, room: state.roomId, err: error.message });
     });
   });
 
@@ -209,6 +318,8 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     );
 
     if (state.tokens < 1) {
+      counters.closedByRateLimit += 1;
+      log.warn({ event: "close", reason: "rate-limit", player: state.id, room: state.roomId });
       socket.close(CLOSE.RATE_LIMIT, "too many messages");
       return;
     }
@@ -217,6 +328,15 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     // 2. Розмір, JSON, форма й відомий тип — усе в одній схемі Zod.
     const result = parseClientMessage(raw, { maxBytes: config.maxMessageBytes });
     if (!result.ok) {
+      counters.rejectedFrames += 1;
+      log.warn({
+        event: "close",
+        reason: "bad-message",
+        code: result.code,
+        detail: result.reason,
+        player: state.id,
+        room: state.roomId,
+      });
       socket.close(result.code, result.reason);
       return;
     }
@@ -259,8 +379,21 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
 
     // Ліміт кімнат: інакше будь-хто створить тисячу порожніх матчів,
     // кожен зі своїм таймером і файлом логу.
-    if (!rooms.get(roomId) && rooms.size >= MAX_ROOMS) {
+    if (!rooms.get(roomId) && rooms.size >= config.maxRooms) {
       socket.close(CLOSE.BAD_SHAPE, "too many rooms");
+      return;
+    }
+
+    /**
+     * Стеля гравців на процес.
+     *
+     * Кімната має свій ліміт, але кімнат багато, і без цієї перевірки
+     * 32 кімнати по 6 гравців дали б 192 гравці в одному циклі подій.
+     * Краще сказати «повно» одному, ніж зіпсувати гру всім.
+     */
+    if (totalPlayers() >= config.maxPlayers) {
+      socket.close(CLOSE.SERVER_FULL, "server is full");
+      log.warn({ event: "join-rejected", reason: "server-full", room: roomId });
       return;
     }
 
@@ -279,6 +412,7 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     state.match = match;
     state.player = player;
 
+    log.info({ event: "ws-join", player: state.id, room: room.id, name, ip: state.ip });
     send(socket, "joined", {
       room: room.toJSON(),
       you: { id: state.id, name, shipId: player.ship.id },
@@ -293,6 +427,8 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     const decoded = decodeInput(raw);
     if (!decoded) {
       // Декодер сам перевірив довжину, байт версії і діапазон кнопок.
+      counters.rejectedFrames += 1;
+      log.warn({ event: "close", reason: "bad-input-frame", player: state.id, room: state.roomId });
       state.socket.close(CLOSE.BAD_SHAPE, "bad input frame");
       return;
     }
@@ -301,6 +437,11 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
 
   function cleanup(socket: WebSocket, state: SocketState, code: number): void {
     clearTimeout(state.joinTimer);
+    const left = (perIp.get(state.ip) ?? 1) - 1;
+    // Ключ прибираємо разом з останнім з'єднанням: інакше Map росла б
+    // на кожну IP, яка колись заходила, і це був би витік пам'яті.
+    if (left <= 0) perIp.delete(state.ip);
+    else perIp.set(state.ip, left);
     if (state.match) {
       state.match.removePlayer(state.id);
       if (state.match.playerCount === 0) {
@@ -311,6 +452,15 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     sockets.delete(socket);
     if (state.roomId) rooms.get(state.roomId)?.remove(state.id);
     logEvent?.({ event: "ws-close", id: state.id, code, dropped: state.dropped });
+    log.info({
+      event: "ws-close",
+      player: state.id,
+      room: state.roomId,
+      code,
+      dropped: state.dropped,
+      bytesIn: state.bytesIn,
+      bytesOut: state.bytesOut,
+    });
   }
 
   /**
@@ -345,9 +495,54 @@ export function attachWebSocket(httpServer: Server, { config, rooms, logEvent }:
     get matchStats() {
       return [...matches.values()].map((m) => m.stats);
     },
+    counters,
+    get players(): number {
+      return totalPlayers();
+    },
+    /** Середній і p95 час кроку по всіх матчах — для /metrics. */
+    get tickMs(): { avg: number; p95: number } {
+      const stats = [...matches.values()].map((m) => m.stats);
+      if (stats.length === 0) return { avg: 0, p95: 0 };
+      const avg = stats.reduce((sum, s) => sum + s.tickMsAvg, 0) / stats.length;
+      // Найгірший матч, а не середнє з p95: якщо одній кімнаті погано,
+      // метрика має це показати, а не розмазати по решті.
+      const p95 = Math.max(...stats.map((s) => s.tickMsP95));
+      return { avg: +avg.toFixed(3), p95: +p95.toFixed(3) };
+    },
+    get droppedInputs(): number {
+      return [...matches.values()].reduce((sum, m) => sum + m.stats.droppedInputs, 0);
+    },
+
+    /**
+     * Перший крок зупинки: більше не пускаємо, попереджаємо гравців.
+     *
+     * Саме попередження робить різницю між «гра зникла» і «сервер
+     * перезапускається»: клієнт отримує shutdown, показує це в лобі
+     * й не намагається перепідключитися до процесу, який уже йде.
+     */
+    stopAccepting(reason: string): number {
+      acceptingConnections = false;
+      let warned = 0;
+      for (const [socket, state] of sockets) {
+        if (socket.readyState !== socket.OPEN) continue;
+        socket.send(encode("shutdown", { reason, retryAfterMs: 5000 }));
+        counters.messagesOut += 1;
+        warned += 1;
+        log.info({ event: "shutdown-notice", player: state.id, room: state.roomId });
+      }
+      return warned;
+    },
     async close(): Promise<void> {
+      acceptingConnections = false;
       clearInterval(pingTimer);
       for (const match of matches.values()) match.stop();
+      /**
+       * 1001 — «going away», а не 1000 «нормально».
+       *
+       * Різниця не формальна: клієнт за кодом вирішує, що робити.
+       * 1000 означає «так і планувалося, сиди в лобі», 1001 —
+       * «сервер пішов, спробуй повернутися пізніше».
+       */
       for (const socket of sockets.keys()) {
         socket.close(CLOSE.SERVER_SHUTDOWN, "server shutdown");
       }

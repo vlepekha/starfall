@@ -32,6 +32,32 @@ const envSchema = z.object({
   MISSED_PONG_LIMIT: intInRange(1, 10, 2),
   MAX_BUFFERED_BYTES: intInRange(1024, 16 << 20, 256 * 1024),
   ROOM_CAPACITY: intInRange(2, 256, 6),
+
+  /* --- Лаба 8: усе, що стосується публічного запуску --- */
+
+  /**
+   * Дозволені Origin — список через кому.
+   *
+   * Чому це не «про всяк випадок»: WebSocket НЕ підпадає під
+   * same-origin policy. Браузер спокійно відкриє з'єднання до нашого
+   * сервера зі будь-якої сторінки в інтернеті, і кукі користувача
+   * поїдуть разом із рукостисканням. Єдине місце, де це можна
+   * зупинити, — перевірка заголовка Origin на сервері.
+   *
+   * Порожній список означає «не перевіряти» і дозволений лише
+   * в розробці: у production схема нижче цього не пропустить.
+   */
+  ALLOWED_ORIGINS: z.string().default(""),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  /** Скільки одночасних з'єднань з однієї IP. */
+  MAX_CONNECTIONS_PER_IP: intInRange(1, 1000, 8),
+  MAX_ROOMS: intInRange(1, 1024, 32),
+  /** Стеля гравців на процес — за межею падає якість у всіх. */
+  MAX_PLAYERS: intInRange(2, 4096, 128),
+  /** SHA збірки: підставляє Docker/CI, видно в /health. */
+  GIT_SHA: z.string().default("dev"),
+  /** Чи віддавати /metrics без авторизації (у production — за токеном). */
+  METRICS_TOKEN: z.string().default(""),
 });
 
 export class ConfigError extends Error {
@@ -54,6 +80,13 @@ export interface Config {
   readonly maxBufferedBytes: number;
   /** Скільки гравців уміщає кімната. Для навантажувальних тестів піднімають. */
   readonly roomCapacity: number;
+  readonly allowedOrigins: readonly string[];
+  readonly nodeEnv: "development" | "production" | "test";
+  readonly maxConnectionsPerIp: number;
+  readonly maxRooms: number;
+  readonly maxPlayers: number;
+  readonly gitSha: string;
+  readonly metricsToken: string;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -84,7 +117,32 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     missedPongLimit: raw.MISSED_PONG_LIMIT,
     maxBufferedBytes: raw.MAX_BUFFERED_BYTES,
     roomCapacity: raw.ROOM_CAPACITY,
+    allowedOrigins: Object.freeze(
+      raw.ALLOWED_ORIGINS.split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean),
+    ),
+    nodeEnv: raw.NODE_ENV,
+    maxConnectionsPerIp: raw.MAX_CONNECTIONS_PER_IP,
+    maxRooms: raw.MAX_ROOMS,
+    maxPlayers: raw.MAX_PLAYERS,
+    gitSha: raw.GIT_SHA,
+    metricsToken: raw.METRICS_TOKEN,
   };
+
+  /**
+   * Єдина перевірка, якої не вміє схема: вона залежить від іншого поля.
+   *
+   * У розробці порожній ALLOWED_ORIGINS зручний. У production це
+   * означає «пускаємо будь-який сайт» — і краще не піднятися зовсім,
+   * ніж піднятися відкритим. Падаємо на старті, а не колись потім.
+   */
+  if (config.nodeEnv === "production" && config.allowedOrigins.length === 0) {
+    throw new ConfigError(
+      "ALLOWED_ORIGINS: у production потрібен хоча б один Origin " +
+        "(наприклад https://starfall.example.com)",
+    );
+  }
 
   mkdirSync(config.logDir, { recursive: true });
   return Object.freeze(config);

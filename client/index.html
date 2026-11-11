@@ -3,11 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Starfall — Lab 05: сервер рахує гру</title>
+    <title>Starfall — мультиплеєрна аркада в реальному часі</title>
+    <meta name="description" content="Космічна аркада в реальному часі: сервер рахує гру, клієнт передбачає рух." />
+    <!-- PWA: без манифесту браузер не запропонує встановити гру. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#070b14" />
+    <link rel="icon" href="/icons/icon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <!-- iOS досі не читає манифест: для нього окремі мета-теги. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Starfall" />
   </head>
   <body>
     <header class="bar">
-      <h1 class="brand"><strong>Starfall</strong> <span class="tag">lab-05</span></h1>
+      <h1 class="brand"><strong>Starfall</strong> <span class="tag">v1.0.0</span></h1>
       <div class="controls">
         <label>Режим <select id="mode"></select></label>
         <label>Блокування, мс <input id="block-ms" type="number" value="20" min="0" max="500" step="5" /></label>
@@ -17,6 +27,7 @@
         <button id="bench" type="button">Run benchmark</button>
         <button id="reset" type="button">Reset ship</button>
         <button id="leave" type="button">Leave room</button>
+        <button id="install" type="button" hidden>Встановити</button>
       </div>
     </header>
 

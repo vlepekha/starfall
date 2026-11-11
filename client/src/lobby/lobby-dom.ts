@@ -10,6 +10,8 @@ import type { Lobby, RoomInfo } from "./lobby.ts";
 export interface LobbyView {
   show(): void;
   hide(): void;
+  /** Повідомлення над списком кімнат: «сервер перезапускається» тощо. */
+  notice(text: string | null, kind?: "info" | "bad"): void;
 }
 
 export function createLobbyView(
@@ -25,6 +27,7 @@ export function createLobbyView(
       </label>
       <div class="lobby__status" id="lobby-status">з'єднання…</div>
     </form>
+    <p class="lobby__notice" id="lobby-notice" hidden></p>
     <ul class="lobby__rooms" id="lobby-rooms"></ul>
     <p class="lobby__hint">Оберіть кімнату, щоб почати. Список оновлюється кожні 4 секунди.</p>
   `;
@@ -32,6 +35,7 @@ export function createLobbyView(
   const nameInput = inputEl("#lobby-name", root);
   const statusEl = el("#lobby-status", root);
   const roomsEl = el("#lobby-rooms", root);
+  const noticeEl = el("#lobby-notice", root);
   nameInput.value = localStorage.getItem("starfall:name") ?? "";
 
   function renderRooms(rooms: RoomInfo[]): void {
@@ -88,6 +92,11 @@ export function createLobbyView(
     },
     hide() {
       root.hidden = true;
+    },
+    notice(text, kind = "info") {
+      noticeEl.hidden = text === null;
+      noticeEl.textContent = text ?? "";
+      noticeEl.classList.toggle("is-bad", kind === "bad");
     },
   };
 }

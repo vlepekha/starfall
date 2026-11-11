@@ -25,6 +25,7 @@ import { createNetcode } from "./net/netcode.ts";
 import { GameSocket } from "./net/socket.ts";
 import { createPerfRecorder } from "./perf.ts";
 import { runPuzzles } from "./puzzles.ts";
+import { setupPwa } from "./pwa.ts";
 import { createRenderer } from "./render/draw.ts";
 import { createHud } from "./render/hud.ts";
 import { createLoadingScreen, type LoadingState } from "./render/loading.ts";
@@ -88,8 +89,61 @@ onCustom<{ you: { shipId: number }; net?: { seed: number; proto: string } }>(
     netcode.stats.proto = net?.proto ?? "binary";
   },
 );
+/**
+ * Сервер попередив, що зупиняється (деплой або перезапуск).
+ *
+ * Це рівно та різниця, яку видно гравцеві: без попередження гра
+ * просто «зависає», а з ним людина бачить, що відбувається, і що
+ * повертатися варто за кілька секунд.
+ */
+onCustom<{ reason?: string; retryAfterMs?: number }>(socket, "shutdown", (detail) => {
+  const seconds = Math.round((detail.retryAfterMs ?? 5000) / 1000);
+  logEvent("net", {
+    text: `${detail.reason ?? "сервер зупиняється"} — повертайтеся за ${seconds} с`,
+  });
+  returnToLobby(`Сервер перезапускається. Спробуйте зайти знову за ${seconds} секунд.`);
+});
+
+/**
+ * Сокет закрився кодом 1001 без попередження — сервер убили (SIGKILL,
+ * падіння контейнера). Повідомлення shutdown ми в такому разі не
+ * отримаємо, тому реагуємо на сам код закриття.
+ */
+onCustom<{ code: number; reason: string }>(socket, "server-going-away", () => {
+  returnToLobby("З'єднання з сервером втрачено. Він, імовірно, перезапускається.");
+});
+
+/**
+ * Будь-яке фатальне закриття теж повертає в лобі: сидіти на чорному
+ * екрані гірше, ніж побачити причину в списку кімнат.
+ */
+onCustom<{ code: number; reason: string; fatal?: boolean }>(socket, "state", (detail) => {
+  if (!detail.fatal) return;
+  returnToLobby(
+    `Сервер відмовив у з'єднанні (код ${detail.code}): ${detail.reason || "без причини"}`,
+  );
+});
+
 const input = createInput();
 const audio = createAudio({ bus });
+
+/* ------------------------------------------------------------------ */
+/*  Встановлення на телефон                                            */
+/* ------------------------------------------------------------------ */
+
+const installButton = button("#install");
+const pwa = setupPwa({
+  onInstallable: (available) => {
+    installButton.hidden = !available;
+  },
+  onUpdated: () => {
+    logEvent("net", { text: "вийшла нова версія — перезавантажте сторінку" });
+  },
+});
+
+installButton.addEventListener("click", () => {
+  void pwa.install();
+});
 const loading = createLoadingScreen(canvas);
 
 let assets: Assets | null = null;
@@ -441,14 +495,26 @@ button("#net-cheat").addEventListener("click", () => {
   });
 });
 
-// Вихід із кімнати: закриваємо сокет і повертаємось у лобі.
-button("#leave").addEventListener("click", () => {
+/**
+ * Повернення в лобі — одне місце для всіх причин: кнопка Leave,
+ * зупинка сервера, фатальна відмова. Раніше кожна причина прибирала
+ * за собою по-своєму, і після деплою в грі лишався працювати цикл.
+ */
+function returnToLobby(message: string | null = null): void {
+  if (stageEl.hidden && message === null) return;
   session = null;
-  socket.close(1000, "leave");
   chat.hide();
   loop?.stop();
+  loop = null;
   stageEl.hidden = true;
   showLobby();
+  lobbyView.notice(message, message ? "bad" : "info");
+}
+
+// Вихід із кімнати: закриваємо сокет і повертаємось у лобі.
+button("#leave").addEventListener("click", () => {
+  socket.close(1000, "leave");
+  returnToLobby();
 });
 
 /** Стрічка подій під ареною. */

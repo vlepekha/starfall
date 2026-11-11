@@ -107,6 +107,18 @@ export class GameSocket extends EventTarget {
         this.#setState("closed", { code: event.code, reason: event.reason, fatal });
         return;
       }
+
+      /**
+       * 1001 «going away» — сервер зупиняється планово (деплой,
+       * перезапуск контейнера). Перепідключатися варто, але не
+       * одразу: процес ще не піднявся, і перша ж спроба точно
+       * впаде. Тому починаємо відлік спроб із більшої паузи.
+       */
+      if (event.code === 1001) {
+        this.#emit("server-going-away", { code: event.code, reason: event.reason });
+        this.#attempt = Math.max(this.#attempt, 2);
+      }
+
       this.#scheduleReconnect();
     });
   }
@@ -159,7 +171,18 @@ export class GameSocket extends EventTarget {
   }
 }
 
+/**
+ * Адреса сокета виводиться зі сторінки, а не прописується.
+ *
+ * Правило просте: https → wss, і ніколи інакше. Браузер усе одно
+ * заблокує ws:// зі сторінки на https (mixed content), але помилка
+ * в консолі виглядала б як «сокет не працює», а не як «ми самі
+ * попросили незахищене з'єднання». Тому вибір тут явний.
+ *
+ * `location.host` разом із портом: так клієнт працює і на
+ * localhost:5173 через проксі Vite, і на публічному домені без порту.
+ */
 function defaultUrl(): string {
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  return `${protocol}//${window.location.host}/ws`;
+  const secure = window.location.protocol === "https:";
+  return `${secure ? "wss:" : "ws:"}//${window.location.host}/ws`;
 }

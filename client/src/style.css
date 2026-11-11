@@ -363,6 +363,22 @@ kbd {
   color: var(--warn);
 }
 
+/* Повідомлення про зупинку сервера: має бути помітним, але не кричати. */
+.lobby__notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lobby__notice.is-bad {
+  border-color: color-mix(in srgb, var(--warn) 65%, transparent);
+}
+
 .lobby__rooms {
   list-style: none;
   margin: 0;

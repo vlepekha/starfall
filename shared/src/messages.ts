@@ -50,6 +50,10 @@ export const CLOSE = {
   RATE_LIMIT: 4003,
   JOIN_TIMEOUT: 4004,
   NOT_JOINED: 4005,
+  /** Забагато з'єднань з однієї IP (лаба 8). */
+  IP_LIMIT: 4006,
+  /** Процес уже тримає стелю гравців (лаба 8). */
+  SERVER_FULL: 4007,
   SERVER_SHUTDOWN: 1001,
 } as const;
 

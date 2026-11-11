@@ -6,6 +6,8 @@ import { extname, join, normalize, resolve, sep } from "node:path";
 import { pipeline } from "node:stream/promises";
 import type { Config } from "./config.ts";
 import { streamReplay } from "./match-log.ts";
+import type { createEventLoopProbe, MetricsSources } from "./metrics.ts";
+import { renderMetrics } from "./metrics.ts";
 import type { RoomRegistry } from "./room.ts";
 
 const MIME: Record<string, string> = {
@@ -17,6 +19,13 @@ const MIME: Record<string, string> = {
   ".wav": "audio/wav",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
+  // Без цього типу браузер ігнорує манифест і не пропонує встановити
+  // гру: Chrome вимагає саме application/manifest+json.
+  ".webmanifest": "application/manifest+json; charset=utf-8",
+  ".webp": "image/webp",
+  ".woff2": "font/woff2",
+  ".map": "application/json; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
 };
 
 /**
@@ -103,6 +112,16 @@ export interface HttpServerOptions {
   getConnections: () => number;
   getMatches?: () => unknown[];
   getMatchStats?: () => unknown[];
+  /**
+   * Чи готовий процес пускати гравців.
+   *
+   * Окремо від «чи живий»: під час зупинки процес ще відповідає
+   * (і має відповідати, щоб догратися поточний матч), але нових
+   * гравців уже не бере.
+   */
+  isReady?: () => boolean;
+  metrics?: MetricsSources;
+  loopProbe?: ReturnType<typeof createEventLoopProbe>;
 }
 
 export function createHttpServer({
@@ -112,6 +131,9 @@ export function createHttpServer({
   getConnections,
   getMatches,
   getMatchStats,
+  isReady = () => true,
+  metrics,
+  loopProbe,
 }: HttpServerOptions): Server {
   const server = createServer(async (req, res) => {
     /**
@@ -135,9 +157,19 @@ export function createHttpServer({
     const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
 
     try {
+      /**
+       * /health — «чи живий процес». Відповідає 200, поки процес
+       * здатний обробити запит. Якщо цей ендпойнт не відповів,
+       * контейнер треба перезапускати: усередині щось назовсім стало.
+       *
+       * Тут же git SHA збірки: єдиний спосіб з вулиці перевірити,
+       * що на хостингу справді розгорнутий той тег, який ми зібрали.
+       */
       if (url.pathname === "/health") {
         return json(res, 200, {
           ok: true,
+          sha: config.gitSha,
+          env: config.nodeEnv,
           uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
           rooms: rooms.size,
           connections: getConnections(),
@@ -145,6 +177,55 @@ export function createHttpServer({
           rss: process.memoryUsage().rss,
           pid: process.pid,
         });
+      }
+
+      /**
+       * /ready — «чи можна пускати гравців». Різниця з /health не
+       * академічна: під час зупинки балансувальник має перестати
+       * надсилати сюди НОВИХ гравців (/ready → 503), але процес ще
+       * живий і доводить поточний матч (/health → 200). Якби був
+       * лише /health, нових гравців кидало б у процес, який уже йде.
+       */
+      if (url.pathname === "/ready") {
+        const ready = isReady();
+        return json(res, ready ? 200 : 503, {
+          ready,
+          sha: config.gitSha,
+          connections: getConnections(),
+          players: metrics?.players() ?? 0,
+          maxPlayers: config.maxPlayers,
+        });
+      }
+
+      /**
+       * /metrics — формат Prometheus.
+       *
+       * У production закритий токеном: сам список метрик безпечний,
+       * але він розповідає, скільки в нас гравців і наскільки сервер
+       * завантажений — зайве знання для чужих.
+       */
+      if (url.pathname === "/metrics") {
+        if (!metrics || !loopProbe) return json(res, 503, { error: "метрики не під'єднані" });
+
+        if (config.metricsToken) {
+          const header = req.headers.authorization ?? "";
+          const token = header.startsWith("Bearer ")
+            ? header.slice(7)
+            : url.searchParams.get("token");
+          if (token !== config.metricsToken) {
+            res.writeHead(401, { "content-type": "text/plain; charset=utf-8" });
+            return res.end("unauthorized");
+          }
+        }
+
+        const body = renderMetrics(metrics, loopProbe, startedAt);
+        res.writeHead(200, {
+          // Саме цей тип очікує Prometheus; із application/json він
+          // просто не розбере відповідь.
+          "content-type": "text/plain; version=0.0.4; charset=utf-8",
+          "content-length": Buffer.byteLength(body),
+        });
+        return res.end(body);
       }
 
       /**
