@@ -22,6 +22,14 @@ jobs:
       # Без цього дозволу push у GHCR повертає 403: GITHUB_TOKEN за
       # замовчуванням має лише читання.
       packages: write
+    # Секрет піднімаємо в env на рівні задачі навмисно.
+    #
+    # У `if:` кроку контекст `secrets` недоступний — GitHub вважає
+    # такий файл невалідним і не запускає робочий процес узагалі
+    # (нуль задач, і в логах немає нічого). А от `env` задачі в `if`
+    # кроку читається, тому перевірка «чи заданий секрет» робиться так.
+    env:
+      DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,11 +70,11 @@ jobs:
       # а просто пропускає деплой — репозиторій лишається робочим
       # у форку й без доступу до хостингу.
       - name: Розгорнути на хостингу
-        if: ${{ secrets.DEPLOY_HOOK_URL != '' }}
+        if: ${{ env.DEPLOY_HOOK_URL != '' }}
         run: |
-          curl -fsS -X POST "${{ secrets.DEPLOY_HOOK_URL }}" \
+          curl -fsS -X POST "$DEPLOY_HOOK_URL" \
             -H 'content-type: application/json' \
-            -d '{"image":"${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}","sha":"${{ github.sha }}"}'
+            -d "{\"image\":\"$REGISTRY/$IMAGE_NAME:$GITHUB_REF_NAME\",\"sha\":\"$GITHUB_SHA\"}"
 
       # Перевірка, що на живій адресі справді наша версія. Без неї
       # «задеплоїли» означало б лише «надіслали запит».
