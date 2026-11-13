@@ -50,18 +50,25 @@ curl -s -o /dev/null -w '%{http_code}\n' URL/ready     # 200
 curl -s URL/metrics | head -3                          # starfall_up 1
 ```
 
-Перевірка, що сервер не пускає чужі сайти:
+Перевірка, що сервер не пускає чужі сайти. Робити це через `curl` з
+заголовками `Upgrade` **не можна** — за проксі хостингу такий запит не стає
+справжнім рукостисканням, падає у віддачу статики й повертає `200`, що
+виглядає як «пропустили», хоча перевірка навіть не запускалася. Потрібен
+справжній WebSocket-клієнт:
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' \
-  -H "Connection: Upgrade" -H "Upgrade: websocket" \
-  -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: AAAAAAAAAAAAAAAAAAAAAA==" \
-  -H "Origin: https://evil.example.net" \
-  URL/ws
+cd ~/Desktop/starfall-lab01/server
+node -e '
+const {WebSocket}=require("ws");
+const ws=new WebSocket("wss://ВАША-АДРЕСА/ws",{origin:"https://evil.example.net"});
+ws.on("open",()=>console.log("ПРОПУЩЕНО — перевірка не працює"));
+ws.on("unexpected-response",(_q,r)=>console.log("відмова HTTP",r.statusCode));
+setTimeout(()=>process.exit(0),10000);'
 ```
 
-Має бути **403**. Якщо раптом `101` — значить сервер нікого не перевіряє;
-напишіть про це, розбиратимемось.
+Очікувано: `відмова HTTP 403`. Для порівняння, зі своєю адресою в `origin`
+з'єднання відкривається, а без заголовка `Origin` (боти, навантажувальний
+тест) — теж, і це навмисно: захищаємося саме від чужої сторінки в браузері.
 
 І головне: відкрити `URL` у браузері, зайти в кімнату, політати. У вкладці
 Network має бути з'єднання `wss://…/ws` — саме `wss`, не `ws`.
