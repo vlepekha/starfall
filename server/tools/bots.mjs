@@ -4,8 +4,11 @@ import { WebSocket } from "ws";
 
 const COUNT = Number(process.argv[2] ?? 8);
 const ROOM = process.argv[3] ?? "alpha";
+// Адреса з оточення: ті самі боти ганяють і локальний сервер, і живий.
+const WS_URL = process.env.WS_URL ?? "ws://127.0.0.1:8080/ws";
+const ORIGIN = process.env.WS_ORIGIN ?? null;
 for (let i = 0; i < COUNT; i += 1) {
-  const ws = new WebSocket("ws://127.0.0.1:8080/ws");
+  const ws = new WebSocket(WS_URL, ORIGIN ? { origin: ORIGIN } : {});
   ws.binaryType = "arraybuffer";
   let n = 0;
   ws.on("open", () => ws.send(JSON.stringify({ type: "join", room: ROOM, name: `bot${i}` })));
@@ -31,4 +34,4 @@ for (let i = 0; i < COUNT; i += 1) {
   });
   ws.on("error", () => {});
 }
-console.log(`${COUNT} ботів у кімнаті ${ROOM}`);
+console.log(`${COUNT} ботів у кімнаті ${ROOM} → ${WS_URL}`);
