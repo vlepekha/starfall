@@ -1,5 +1,6 @@
 import { World } from "@starfall/shared";
 import { type Config, ConfigError, loadConfig } from "./config.ts";
+import { installFatalHandlers } from "./fatal.ts";
 import { createHttpServer } from "./http-server.ts";
 import { createLogger } from "./log.ts";
 import { createMatchLog } from "./match-log.ts";
@@ -187,25 +188,7 @@ process.on("SIGINT", () => void shutdown("SIGINT"));
 process.on("SIGTERM", () => void shutdown("SIGTERM"));
 
 /**
- * Необроблені помилки: записати й вийти.
- *
- * Спокуса повісити порожній обробник і «працювати далі» — найгірше
- * з можливого: після необробленого винятку процес у невідомому стані,
- * і далі він обслуговує гравців уже навмання. Правильно — вийти з
- * ненульовим кодом і дати платформі підняти свіжий процес.
- *
- * Код 1, а не 0: інакше хостинг вважатиме, що ми завершилися штатно,
- * і може не перезапустити.
+ * Необроблені помилки: записати й вийти. Деталі — у fatal.ts,
+ * де це можна перевірити тестом.
  */
-process.on("uncaughtException", (error: Error) => {
-  log.fatal({ event: "uncaughtException", err: error.message, stack: error.stack });
-  // Логи pino пишуться синхронно в stdout, тож рядок уже назовні.
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason: unknown) => {
-  const message = reason instanceof Error ? reason.message : String(reason);
-  const stack = reason instanceof Error ? reason.stack : undefined;
-  log.fatal({ event: "unhandledRejection", err: message, stack });
-  process.exit(1);
-});
+installFatalHandlers({ log });
