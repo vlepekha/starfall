@@ -1,37 +1,35 @@
 import { expect, test } from "@playwright/test";
 
 /**
- * Сервер зник посеред матчу — гравець має опинитися в лобі.
+ * Зв'язок обірвався посеред матчу — гравець має опинитися в лобі.
  *
- * Перевіряти це ботом не можна: питання саме про те, що БАЧИТЬ людина.
- * Тому справжній браузер і справжній матч.
+ * Це сценарій «сервер убили»: SIGKILL, впав контейнер, обірвалася
+ * мережа. Від планової зупинки він відрізняється тим, що клієнт не
+ * отримує НІЧОГО — ні повідомлення shutdown, ні коду 1001.
  *
- * Сам сервер ми не вбиваємо — він спільний для всіх тестів. Обрив
- * імітуємо так, як він виглядає з боку клієнта при SIGKILL: сокет
- * закривається без кадру закриття, тобто код 1006 і жодного
- * попередження від сервера.
+ * Обрив робимо через перехоплення самого з'єднання
+ * (`page.routeWebSocket`): Playwright проксує сокет до справжнього
+ * сервера, матч іде як звичайно, а потім ми рвемо канал.
  *
- * Перехоплення WebSocket живе в тесті, а не в коді гри: тестовий
- * гачок у робочому коді — це те, що потім ніхто не наважиться прибрати.
+ * Дві попередні спроби не працювали, і обидві повчальні:
+ *   - закривати сокет зсередини сторінки через підмінений конструктор
+ *     WebSocket — нестабільно: тест чіплявся до внутрішнього об'єкта
+ *     застосунку й міг зловити не той екземпляр;
+ *   - `context.setOffline(true)` — узагалі не рве вже встановлений
+ *     WebSocket: сторінка продовжувала вважати, що вона онлайн.
  */
 test("після обриву з'єднання гравець повертається в лобі", async ({ page }) => {
-  await page.addInitScript(() => {
-    const Original = window.WebSocket;
-    const opened: WebSocket[] = [];
-    (window as unknown as { __opened: WebSocket[] }).__opened = opened;
+  let cut: (() => void) | null = null;
 
-    class Recorded extends Original {
-      constructor(url: string | URL, protocols?: string | string[]) {
-        super(url, protocols);
-        opened.push(this);
-      }
-    }
-    window.WebSocket = Recorded as unknown as typeof WebSocket;
+  await page.routeWebSocket("**/ws", (ws) => {
+    // Проксуємо до справжнього сервера: нам потрібен справжній матч,
+    // а не заглушка.
+    ws.connectToServer();
+    cut = () => ws.close();
   });
 
   await page.goto("/");
 
-  // Лобі з'являється лише після завантаження ассетів.
   await expect(page.locator("#lobby-rooms li")).not.toHaveCount(0, { timeout: 20_000 });
   await page.fill("#lobby-name", "Тест");
   await page.locator("#lobby-rooms li", { hasText: "alpha" }).first().locator("button").click();
@@ -40,15 +38,11 @@ test("після обриву з'єднання гравець повертає�
   await expect(page.locator("#chat-state")).toHaveText("онлайн");
   await expect(page.locator(".stage")).toBeVisible();
 
-  // Рвемо з'єднання зсередини сторінки, без кадру закриття.
-  await page.evaluate(() => {
-    const opened = (window as unknown as { __opened: WebSocket[] }).__opened;
-    for (const socket of opened) {
-      if (socket.readyState === WebSocket.OPEN) socket.close();
-    }
-  });
+  expect(cut, "сокет не був перехоплений").not.toBeNull();
+  cut?.();
 
-  // Лобі має повернутися саме, без дій гравця.
-  await expect(page.locator("#lobby")).toBeVisible({ timeout: 10_000 });
+  // Лобі має повернутися саме, без жодних дій гравця.
+  await expect(page.locator(".stage")).toBeHidden({ timeout: 15_000 });
+  await expect(page.locator("#lobby")).toBeVisible();
   await expect(page.locator("#lobby-notice")).toContainText(/з'єднання/i);
 });
