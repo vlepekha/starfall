@@ -39,6 +39,11 @@ open("README.md", "w").write(s)
 PY
 
 git add README.md
-git commit -m "README: жива адреса $URL"
+# Автора вказуємо явно: у репозиторії може не бути налаштованого
+# user.email, і тоді git підставить локальне ім'я машини — у публічному
+# репозиторії воно виглядає як чужий коміт.
+git commit \
+  --author="vlepekha <329668767+vlepekha@users.noreply.github.com>" \
+  -m "README: жива адреса $URL"
 git push
 echo "готово — адреса в README і запушена"
