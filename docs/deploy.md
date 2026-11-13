@@ -72,9 +72,12 @@ Network має бути з'єднання `wss://…/ws` — саме `wss`, н�
 
 ```bash
 cd ~/Desktop/starfall-lab01
-sed -i '' 's|<!-- PUBLIC_URL --> `https://…`|<!-- PUBLIC_URL --> https://ВАША-АДРЕСА|' README.md
-git add README.md && git commit -m "README: жива адреса" && git push
+./scripts/set-public-url.sh https://ВАША-АДРЕСА
 ```
+
+Скрипт спершу сам смикає `/health` — і лише якщо адреса відповідає, вписує
+її в README, комітить і пушить. Так у README не опиниться адреса з
+помилкою в домені.
 
 ---
 
