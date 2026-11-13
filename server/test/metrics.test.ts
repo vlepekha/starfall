@@ -16,6 +16,9 @@ function sources(overrides: Partial<MetricsSources> = {}): MetricsSources {
     closedByRateLimit: () => 1,
     closedByOrigin: () => 2,
     ready: () => true,
+    messagesPerSecond: () => 640,
+    bytesInPerSecond: () => 12_800,
+    bytesOutPerSecond: () => 98_000,
     ...overrides,
   };
 }
@@ -40,6 +43,10 @@ describe("renderMetrics", () => {
     expect(body).toMatch(/^starfall_bytes_out_total 890000$/m);
     expect(body).toMatch(/^starfall_tick_ms_p95 1.2$/m);
     expect(body).toMatch(/^starfall_closed_bad_origin_total 2$/m);
+    // Швидкості — поруч із лічильниками: подивитися «скільки зараз»
+    // треба і без Prometheus, простим curl під навантаженням.
+    expect(body).toMatch(/^starfall_messages_per_second 640$/m);
+    expect(body).toMatch(/^starfall_bytes_out_per_second 98000$/m);
   });
 
   test("uptime рахується від startedAt", () => {
@@ -63,6 +70,21 @@ describe("renderMetrics", () => {
       if (line.startsWith("#")) continue;
       expect(line).toMatch(/^\S+ -?[\d.e+]+$/);
     }
+  });
+});
+
+describe("createRateTracker", () => {
+  test("рахує приріст за секунду по ковзному вікну", async () => {
+    const { createRateTracker } = await import("../src/metrics.ts");
+    let messages = 0;
+    const tracker = createRateTracker(() => ({ messages, bytesIn: 0, bytesOut: 0 }));
+
+    // Одна вибірка — швидкості ще немає, і це правильна відповідь:
+    // приросту ні з чим порівнювати.
+    expect(tracker.messagesPerSecond()).toBe(0);
+    messages = 100;
+    expect(tracker.messagesPerSecond()).toBe(0);
+    tracker.stop();
   });
 });
 

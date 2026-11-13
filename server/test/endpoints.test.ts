@@ -39,6 +39,9 @@ function start(env: Record<string, string> = {}, { ready = () => true } = {}) {
       closedByRateLimit: () => 0,
       closedByOrigin: () => 0,
       ready,
+      messagesPerSecond: () => 0,
+      bytesInPerSecond: () => 0,
+      bytesOutPerSecond: () => 0,
     },
   });
   return new Promise<{ url: string; close: () => Promise<void> }>((resolve) => {

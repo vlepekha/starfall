@@ -3,7 +3,7 @@ import { type Config, ConfigError, loadConfig } from "./config.ts";
 import { createHttpServer } from "./http-server.ts";
 import { createLogger } from "./log.ts";
 import { createMatchLog } from "./match-log.ts";
-import { createEventLoopProbe } from "./metrics.ts";
+import { createEventLoopProbe, createRateTracker } from "./metrics.ts";
 import { RoomRegistry } from "./room.ts";
 import { attachWebSocket } from "./ws-server.ts";
 
@@ -34,6 +34,11 @@ const rooms = new RoomRegistry();
 const serverLog = createMatchLog(config.logDir, "server");
 const log = createLogger(config);
 const loopProbe = createEventLoopProbe();
+const rates = createRateTracker(() => ({
+  messages: ws.counters.messagesIn + ws.counters.messagesOut,
+  bytesIn: ws.counters.bytesIn,
+  bytesOut: ws.counters.bytesOut,
+}));
 
 /**
  * Готовність — окремий прапорець, а не похідна від «чи живий».
@@ -63,6 +68,9 @@ const httpServer = createHttpServer({
     closedByRateLimit: () => ws.counters.closedByRateLimit,
     closedByOrigin: () => ws.counters.closedByOrigin,
     ready: () => ready,
+    messagesPerSecond: rates.messagesPerSecond,
+    bytesInPerSecond: rates.bytesInPerSecond,
+    bytesOutPerSecond: rates.bytesOutPerSecond,
   },
 });
 
@@ -164,6 +172,7 @@ async function shutdown(signal: string): Promise<void> {
   const warned = ws.stopAccepting(`сервер зупиняється (${signal})`);
   if (warned > 0) await new Promise((resolve) => setTimeout(resolve, SHUTDOWN_NOTICE_MS));
 
+  rates.stop();
   await ws.close();
   await new Promise((resolve) => httpServer.close(resolve));
   await serverLog.close();

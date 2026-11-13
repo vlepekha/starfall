@@ -26,6 +26,10 @@ export interface MetricsSources {
   closedByRateLimit: () => number;
   closedByOrigin: () => number;
   ready: () => boolean;
+  /** Швидкості по ковзному вікну — див. createRateTracker. */
+  messagesPerSecond: () => number;
+  bytesInPerSecond: () => number;
+  bytesOutPerSecond: () => number;
 }
 
 /**
@@ -60,6 +64,65 @@ export function createEventLoopProbe() {
     reset(): void {
       histogram.reset();
     },
+  };
+}
+
+/**
+ * Швидкості — окремо від лічильників.
+ *
+ * За Prometheus правильно віддавати лічильники, а `rate()` рахує сам
+ * запит. Але подивитися «скільки зараз повідомлень за секунду» треба
+ * і без Prometheus — у тій же curl під час навантаження. Тому поруч
+ * із `_total` є гейджі, пораховані по ковзному вікну.
+ *
+ * Вікно 10 с: менше — і число стрибає від одного знімка, більше —
+ * і сплеск розмазується так, що його не видно.
+ */
+const WINDOW_SECONDS = 10;
+
+export function createRateTracker(
+  read: () => { messages: number; bytesIn: number; bytesOut: number },
+) {
+  interface Sample {
+    at: number;
+    messages: number;
+    bytesIn: number;
+    bytesOut: number;
+  }
+
+  const samples: Sample[] = [];
+  const push = (): void => {
+    const current = read();
+    samples.push({ at: Date.now(), ...current });
+    while (samples.length > WINDOW_SECONDS + 1) samples.shift();
+  };
+
+  /**
+   * Першу вибірку НЕ беремо одразу — і це не дрібниця.
+   *
+   * `read()` тягнеться до ws-шару, який у index.ts оголошений нижче:
+   * виклик під час створення падав із «Cannot access 'ws' before
+   * initialization», і сервер не піднімався взагалі. Перша вибірка
+   * тепер на першому тіку, коли все вже існує.
+   *
+   * unref(), щоб таймер не тримав процес живим під час зупинки.
+   */
+  const timer = setInterval(push, 1000);
+  timer.unref();
+
+  const rate = (pick: (s: Sample) => number): number => {
+    const first = samples[0];
+    const last = samples.at(-1);
+    if (!first || !last || last.at === first.at) return 0;
+    const seconds = (last.at - first.at) / 1000;
+    return +((pick(last) - pick(first)) / seconds).toFixed(1);
+  };
+
+  return {
+    messagesPerSecond: () => rate((s) => s.messages),
+    bytesInPerSecond: () => rate((s) => s.bytesIn),
+    bytesOutPerSecond: () => rate((s) => s.bytesOut),
+    stop: () => clearInterval(timer),
   };
 }
 
@@ -139,6 +202,24 @@ export function renderMetrics(
       help: "Байтів клієнтам від старту",
       type: "counter",
       value: sources.bytesOut(),
+    },
+    {
+      name: "starfall_messages_per_second",
+      help: "Повідомлень за секунду (ковзне вікно 10 с)",
+      type: "gauge",
+      value: sources.messagesPerSecond(),
+    },
+    {
+      name: "starfall_bytes_in_per_second",
+      help: "Вхідних байтів за секунду (ковзне вікно 10 с)",
+      type: "gauge",
+      value: sources.bytesInPerSecond(),
+    },
+    {
+      name: "starfall_bytes_out_per_second",
+      help: "Вихідних байтів за секунду (ковзне вікно 10 с)",
+      type: "gauge",
+      value: sources.bytesOutPerSecond(),
     },
     {
       name: "starfall_tick_ms_avg",
