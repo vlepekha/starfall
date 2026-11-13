@@ -1,0 +1,41 @@
+# Fly.io. Деплой: flyctl launch --copy-config, далі flyctl deploy.
+#
+# Відмінність від Render у головному: Fly за замовчуванням зупиняє
+# машину, коли немає трафіку. Для гри це неприйнятно — гравець,
+# який зайшов першим, чекав би холодний старт. Тому auto_stop вимкнено.
+app = "starfall"
+primary_region = "waw"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  HOST = "0.0.0.0"
+  PORT = "8080"
+  MAX_PLAYERS = "128"
+  MAX_CONNECTIONS_PER_IP = "8"
+  # ALLOWED_ORIGINS задається секретом після першого деплою:
+  #   flyctl secrets set ALLOWED_ORIGINS=https://starfall.fly.dev
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  # WebSocket за проксі Fly працює без окремих налаштувань: проксі
+  # пропускає Upgrade сам. Таймаут простою підняти варто — гравець,
+  # який стоїть у лобі, не має відвалюватися.
+  [http_service.concurrency]
+    type = "connections"
+    soft_limit = 100
+    hard_limit = 128
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/health"

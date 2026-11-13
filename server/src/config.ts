@@ -55,7 +55,17 @@ const envSchema = z.object({
   /** Стеля гравців на процес — за межею падає якість у всіх. */
   MAX_PLAYERS: intInRange(2, 4096, 128),
   /** SHA збірки: підставляє Docker/CI, видно в /health. */
-  GIT_SHA: z.string().default("dev"),
+  GIT_SHA: z.string().default(""),
+  /**
+   * Запасні джерела того самого SHA — їх кладуть самі хостинги.
+   *
+   * Потрібні, бо не кожна платформа вміє передати build-arg в образ:
+   * Render збирає Dockerfile сам і GIT_SHA не підставляє, зате
+   * додає RENDER_GIT_COMMIT в оточення. Без цього /health на Render
+   * вічно показував би "dev", і перевірити розгорнуту версію було б нічим.
+   */
+  RENDER_GIT_COMMIT: z.string().default(""),
+  FLY_MACHINE_VERSION: z.string().default(""),
   /** Чи віддавати /metrics без авторизації (у production — за токеном). */
   METRICS_TOKEN: z.string().default(""),
 });
@@ -126,7 +136,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     maxConnectionsPerIp: raw.MAX_CONNECTIONS_PER_IP,
     maxRooms: raw.MAX_ROOMS,
     maxPlayers: raw.MAX_PLAYERS,
-    gitSha: raw.GIT_SHA,
+    gitSha: raw.GIT_SHA || raw.RENDER_GIT_COMMIT || raw.FLY_MACHINE_VERSION || "dev",
     metricsToken: raw.METRICS_TOKEN,
   };
 

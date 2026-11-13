@@ -99,3 +99,27 @@ describe("конфіг публічного запуску", () => {
     expect(() => loadConfig({ ...base, MAX_CONNECTIONS_PER_IP: "0" })).toThrow(ConfigError);
   });
 });
+
+describe("SHA збірки в /health", () => {
+  test("береться з GIT_SHA, коли його передав CI", () => {
+    expect(loadConfig({ ...base, GIT_SHA: "abc123" }).gitSha).toBe("abc123");
+  });
+
+  /**
+   * Render збирає Dockerfile сам і build-arg не передає, зате кладе
+   * комміт в оточення. Без запасного джерела /health показував би
+   * "dev", і перевірити розгорнуту версію не було б чим.
+   */
+  test("запасне джерело — RENDER_GIT_COMMIT", () => {
+    expect(loadConfig({ ...base, RENDER_GIT_COMMIT: "render777" }).gitSha).toBe("render777");
+  });
+
+  test("GIT_SHA має пріоритет над хостинговим", () => {
+    const config = loadConfig({ ...base, GIT_SHA: "ci1", RENDER_GIT_COMMIT: "render2" });
+    expect(config.gitSha).toBe("ci1");
+  });
+
+  test("без жодного джерела — dev", () => {
+    expect(loadConfig({ ...base }).gitSha).toBe("dev");
+  });
+});

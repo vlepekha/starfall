@@ -1,0 +1,38 @@
+# Blueprint для Render: «New → Blueprint → обрати цей репозиторій».
+#
+# Чому саме так, а не «підключіть репозиторій і понатискайте кнопки»:
+# з цим файлом налаштування живе в репозиторії разом із кодом. Через
+# півроку буде видно, ЧОМУ стоїть саме такий healthCheckPath і звідки
+# взявся ALLOWED_ORIGINS, а не доведеться згадувати, що там у панелі.
+services:
+  - type: web
+    name: starfall
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    # Render сам стежить за цим шляхом і не пускає трафік на екземпляр,
+    # який ще не піднявся.
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # HOST саме 0.0.0.0: на 127.0.0.1 процес був би недосяжний
+      # іззовні контейнера, і Render вважав би його мертвим.
+      - key: HOST
+        value: 0.0.0.0
+      # PORT підставляє Render — не прошиваємо.
+      - key: ALLOWED_ORIGINS
+        # Заповнюється після першого деплою справжнім доменом:
+        # https://starfall-xxxx.onrender.com
+        sync: false
+      - key: MAX_PLAYERS
+        value: 128
+      - key: MAX_CONNECTIONS_PER_IP
+        value: 8
+      - key: ROOM_CAPACITY
+        value: 6
+      # GIT_SHA тут не задаємо навмисно: Render сам кладе в оточення
+      # RENDER_GIT_COMMIT, і конфіг сервера бере його як запасний
+      # варіант. Посилатися на fromService не можна — серед його
+      # властивостей (host, port, connectionString) комміта немає.
