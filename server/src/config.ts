@@ -66,6 +66,16 @@ const envSchema = z.object({
    */
   RENDER_GIT_COMMIT: z.string().default(""),
   FLY_MACHINE_VERSION: z.string().default(""),
+  /**
+   * Власна адреса сервісу — її дає сам хостинг.
+   *
+   * Розв'язує проблему «курки і яйця» при першому деплої: ALLOWED_ORIGINS
+   * треба задати ДО створення сервісу, а адреса стає відомою тільки
+   * ПІСЛЯ. Сторінку гри ми віддаємо з того самого походження, тож
+   * власна адреса в списку дозволених — це не послаблення перевірки,
+   * а рівно те, що й мало бути.
+   */
+  RENDER_EXTERNAL_URL: z.string().default(""),
   /** Чи віддавати /metrics без авторизації (у production — за токеном). */
   METRICS_TOKEN: z.string().default(""),
 });
@@ -99,6 +109,32 @@ export interface Config {
   readonly metricsToken: string;
 }
 
+/**
+ * Список дозволених Origin: заданий руками плюс власна адреса сервісу.
+ *
+ * `new URL(...).origin` навмисно: хостинг віддає повний URL
+ * (`https://starfall-abc.onrender.com/`), а в заголовку Origin слеша
+ * в кінці немає — порівняння рядків без нормалізації мовчки
+ * не спрацювало б.
+ */
+function originList(configured: string, ownUrl: string): string[] {
+  const origins = configured
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  if (ownUrl) {
+    try {
+      const own = new URL(ownUrl).origin;
+      if (!origins.includes(own)) origins.push(own);
+    } catch {
+      // Битий URL від хостингу — не привід не піднятися.
+    }
+  }
+
+  return origins;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const parsed = envSchema.safeParse(env);
   if (!parsed.success) {
@@ -127,11 +163,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     missedPongLimit: raw.MISSED_PONG_LIMIT,
     maxBufferedBytes: raw.MAX_BUFFERED_BYTES,
     roomCapacity: raw.ROOM_CAPACITY,
-    allowedOrigins: Object.freeze(
-      raw.ALLOWED_ORIGINS.split(",")
-        .map((origin) => origin.trim())
-        .filter(Boolean),
-    ),
+    allowedOrigins: Object.freeze(originList(raw.ALLOWED_ORIGINS, raw.RENDER_EXTERNAL_URL)),
     nodeEnv: raw.NODE_ENV,
     maxConnectionsPerIp: raw.MAX_CONNECTIONS_PER_IP,
     maxRooms: raw.MAX_ROOMS,

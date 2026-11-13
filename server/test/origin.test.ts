@@ -123,3 +123,63 @@ describe("SHA збірки в /health", () => {
     expect(loadConfig({ ...base }).gitSha).toBe("dev");
   });
 });
+
+describe("власна адреса сервісу в списку Origin", () => {
+  /**
+   * Проблема «курки і яйця»: на Render значення `sync: false`
+   * запитують ДО створення сервісу, а адреса стає відомою ПІСЛЯ.
+   * Тому власну адресу беремо з оточення, яке дає сам хостинг.
+   */
+  test("RENDER_EXTERNAL_URL потрапляє в дозволені", () => {
+    const config = loadConfig({
+      ...base,
+      RENDER_EXTERNAL_URL: "https://starfall-abc.onrender.com",
+    });
+    expect(config.allowedOrigins).toEqual(["https://starfall-abc.onrender.com"]);
+  });
+
+  /** Хостинг віддає URL зі слешем, а в заголовку Origin слеша немає. */
+  test("слеш у кінці відкидається", () => {
+    const config = loadConfig({
+      ...base,
+      RENDER_EXTERNAL_URL: "https://starfall-abc.onrender.com/",
+    });
+    expect(config.allowedOrigins).toEqual(["https://starfall-abc.onrender.com"]);
+  });
+
+  test("додається до заданих вручну, не замінює їх", () => {
+    const config = loadConfig({
+      ...base,
+      ALLOWED_ORIGINS: "https://моя-адреса.example.com",
+      RENDER_EXTERNAL_URL: "https://starfall-abc.onrender.com",
+    });
+    expect(config.allowedOrigins).toEqual([
+      "https://моя-адреса.example.com",
+      "https://starfall-abc.onrender.com",
+    ]);
+  });
+
+  test("не дублюється, якщо вже заданий вручну", () => {
+    const config = loadConfig({
+      ...base,
+      ALLOWED_ORIGINS: "https://starfall-abc.onrender.com",
+      RENDER_EXTERNAL_URL: "https://starfall-abc.onrender.com",
+    });
+    expect(config.allowedOrigins).toHaveLength(1);
+  });
+
+  /** Цього достатньо, щоб production піднявся без ручних змінних. */
+  test("production стартує лише з адресою від хостингу", () => {
+    const config = loadConfig({
+      ...base,
+      NODE_ENV: "production",
+      RENDER_EXTERNAL_URL: "https://starfall-abc.onrender.com",
+    });
+    expect(config.allowedOrigins).toHaveLength(1);
+  });
+
+  test("битий URL від хостингу не валить старт", () => {
+    const config = loadConfig({ ...base, RENDER_EXTERNAL_URL: "не-url" });
+    expect(config.allowedOrigins).toEqual([]);
+  });
+});

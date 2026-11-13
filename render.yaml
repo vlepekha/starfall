@@ -1,19 +1,21 @@
 # Blueprint для Render: «New → Blueprint → обрати цей репозиторій».
 #
-# Чому саме так, а не «підключіть репозиторій і понатискайте кнопки»:
-# з цим файлом налаштування живе в репозиторії разом із кодом. Через
-# півроку буде видно, ЧОМУ стоїть саме такий healthCheckPath і звідки
-# взявся ALLOWED_ORIGINS, а не доведеться згадувати, що там у панелі.
+# Нічого вписувати руками не треба — і це не випадково.
+#
+# Природний спосіб був би задати ALLOWED_ORIGINS через `sync: false`,
+# щоб Render запитав значення під час створення. Але він питає його
+# РАНІШЕ, ніж сервіс існує, тобто коли адреса ще невідома — а саме
+# адресу туди й треба вписати. Тому сервер бере власне походження
+# з RENDER_EXTERNAL_URL, яке хостинг підставляє сам (див. server/src/config.ts).
 services:
   - type: web
     name: starfall
-    runtime: docker
+    runtime: docker          # `env:` застаріле, актуальне — `runtime:`
     dockerfilePath: ./Dockerfile
     plan: free
     region: frankfurt
     healthCheckPath: /health
-    # Render сам стежить за цим шляхом і не пускає трафік на екземпляр,
-    # який ще не піднявся.
+    # Render не пускає трафік на екземпляр, поки цей шлях не відповів.
     envVars:
       - key: NODE_ENV
         value: production
@@ -21,18 +23,16 @@ services:
       # іззовні контейнера, і Render вважав би його мертвим.
       - key: HOST
         value: 0.0.0.0
-      # PORT підставляє Render — не прошиваємо.
-      - key: ALLOWED_ORIGINS
-        # Заповнюється після першого деплою справжнім доменом:
-        # https://starfall-xxxx.onrender.com
-        sync: false
+      # Типовий порт Render — 10000. Задаємо явно, щоб не покладатися
+      # на збіг зі значенням у Dockerfile.
+      - key: PORT
+        value: 10000
       - key: MAX_PLAYERS
         value: 128
       - key: MAX_CONNECTIONS_PER_IP
         value: 8
       - key: ROOM_CAPACITY
         value: 6
-      # GIT_SHA тут не задаємо навмисно: Render сам кладе в оточення
-      # RENDER_GIT_COMMIT, і конфіг сервера бере його як запасний
-      # варіант. Посилатися на fromService не можна — серед його
-      # властивостей (host, port, connectionString) комміта немає.
+      # GIT_SHA не задаємо: Render збирає Dockerfile сам і build-arg не
+      # передає, зате кладе в оточення RENDER_GIT_COMMIT — сервер бере
+      # його як запасне джерело, і /health показує справжній комміт.
