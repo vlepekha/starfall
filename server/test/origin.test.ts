@@ -183,3 +183,20 @@ describe("власна адреса сервісу в списку Origin", () =
     expect(config.allowedOrigins).toEqual([]);
   });
 });
+
+describe("порожній GIT_SHA не перекриває хостинг", () => {
+  /**
+   * Саме через це /health на Render показував "dev": у Dockerfile
+   * стояло `ARG GIT_SHA=dev`, тобто змінна була НЕПОРОЖНЯ і вигравала
+   * в черзі запасних джерел. Тепер типове значення — порожній рядок.
+   */
+  test("порожній GIT_SHA пропускає чергу до RENDER_GIT_COMMIT", () => {
+    const config = loadConfig({ ...base, GIT_SHA: "", RENDER_GIT_COMMIT: "render777" });
+    expect(config.gitSha).toBe("render777");
+  });
+
+  test("порожні всі джерела — лишається dev", () => {
+    const config = loadConfig({ ...base, GIT_SHA: "", RENDER_GIT_COMMIT: "" });
+    expect(config.gitSha).toBe("dev");
+  });
+});
