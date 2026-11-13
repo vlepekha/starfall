@@ -91,10 +91,16 @@ export class Match {
     this.seed = seed >>> 0;
     this.onSnapshot = onSnapshot;
 
-    this.game = createGame({ seed: this.seed, config: { asteroidLimit: 8 } });
-    // Корабель із createGame — «нічий»: у мережевій грі кожен гравець
-    // отримує власний, тож прибираємо його з арени.
-    this.game.world.despawn(this.game.ship);
+    /**
+     * `soloShip: false` — у мережевій грі кожен гравець отримує власний
+     * корабель у addPlayer, а «нічий» нікому не належить.
+     *
+     * Раніше тут був `world.despawn(this.game.ship)`, і це НЕ працювало:
+     * правила одиночної гри відроджують цей корабель на наступному ж
+     * кроці. В результаті посеред арени стояв зайвий корабель, якого
+     * ніхто не контролював, — його було видно будь-якому гравцеві.
+     */
+    this.game = createGame({ seed: this.seed, config: { asteroidLimit: 8 }, soloShip: false });
     this.game.world.step(0);
   }
 

@@ -114,13 +114,33 @@ export interface GameOptions {
   bus?: EventSink | null;
   config?: Partial<ArenaConfig>;
   seed?: number;
+  /**
+   * Чи живе в світі «нічий» корабель — той, яким керує гравець у
+   * режимі одного гравця (лаби 1–2).
+   *
+   * На сервері він не потрібен: кожен гравець отримує власний корабель
+   * у `Match.addPlayer`. Прибрати його ззовні через `world.despawn()`
+   * НЕ вийде — логіка нижче відродить його на наступному ж кроці,
+   * бо для одиночної гри це правильна поведінка. Саме так на сервері
+   * і з'явився зайвий корабель, який стояв посеред арени й нікому не
+   * належав.
+   */
+  soloShip?: boolean;
 }
 
-export function createGame({ onEvent, bus, config = {}, seed = 1 }: GameOptions = {}): Game {
+export function createGame({
+  onEvent,
+  bus,
+  config = {},
+  seed = 1,
+  soloShip = true,
+}: GameOptions = {}): Game {
   const settings: ArenaConfig = { ...DEFAULT_CONFIG, ...config };
   const world = new World({ bus, seed });
+  // Корабель створюємо завжди, щоб `game.ship` лишався тим самим типом,
+  // але в світ додаємо лише в одиночному режимі.
   const ship = new Ship({ pos: new Vector2(WORLD.width / 2, WORLD.height / 2) });
-  world.add(ship);
+  if (soloShip) world.add(ship);
 
   let respawnTimer = 0;
   let asteroidTimer = 3;
@@ -174,7 +194,7 @@ export function createGame({ onEvent, bus, config = {}, seed = 1 }: GameOptions 
     },
 
     step(dt: number): void {
-      if (!ship.alive) {
+      if (soloShip && !ship.alive) {
         respawnTimer -= dt;
         if (respawnTimer <= 0) {
           ship.reset(new Vector2(WORLD.width / 2, WORLD.height / 2));
